@@ -76,9 +76,12 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_admin_role:
-            return Notification.objects.filter(is_active=True).order_by('-created_at')
+            return Notification.objects.filter(
+                Q(target__in=['ALL', 'ADMIN']) | Q(recipient=user),
+                is_active=True
+            ).order_by('-created_at')
         return Notification.objects.filter(
-            Q(target='ALL') | Q(target='EMPLOYEE'),
+            Q(recipient=user) | Q(recipient__isnull=True, target__in=['ALL', 'EMPLOYEE']),
             is_active=True
         ).order_by('-created_at')
 

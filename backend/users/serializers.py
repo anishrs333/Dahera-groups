@@ -33,13 +33,13 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = ['id', 'title', 'message', 'target', 'created_by', 'created_by_name', 'created_at', 'is_active']
+        fields = ['id', 'recipient', 'title', 'message', 'target', 'link_tab', 'created_by', 'created_by_name', 'created_at', 'is_active']
         read_only_fields = ['id', 'created_by', 'created_at']
 
     def get_created_by_name(self, obj):
         if obj.created_by:
             return obj.created_by.get_full_name() or obj.created_by.username
-        return 'Admin'
+        return 'System'
 
 class UserCreateUpdateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=False, allow_blank=True, allow_null=True)

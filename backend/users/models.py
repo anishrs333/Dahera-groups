@@ -51,9 +51,11 @@ class Notification(models.Model):
         EMPLOYEE = 'EMPLOYEE', 'Employees Only'
         ADMIN = 'ADMIN', 'Admins Only'
 
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='received_notifications')
     title = models.CharField(max_length=200)
     message = models.TextField()
     target = models.CharField(max_length=20, choices=Target.choices, default=Target.ALL)
+    link_tab = models.CharField(max_length=50, blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_notifications')
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)

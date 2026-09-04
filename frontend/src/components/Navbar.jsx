@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { Building2, Clock, Menu, Sun, Moon, LogOut, Bell, Send, X, AlertCircle, Megaphone } from 'lucide-react';
+import { Building2, Clock, Menu, Sun, Moon, LogOut, Bell, Send, X, Megaphone } from 'lucide-react';
 
-export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
+export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode }) => {
   const { user, logout } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [showNotifPanel, setShowNotifPanel] = useState(false);
@@ -32,7 +32,7 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
   useEffect(() => {
     if (user) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 15000);
+      const interval = setInterval(fetchNotifications, 10000);
       return () => clearInterval(interval);
     }
   }, [user]);
@@ -48,6 +48,13 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
       alert("Notification broadcasted successfully!");
     } catch (err) {
       setNotifMsg(err.response?.data?.detail || 'Error sending notification.');
+    }
+  };
+
+  const handleNotificationClick = (n) => {
+    setShowNotifPanel(false);
+    if (n.link_tab && onSelectTab) {
+      onSelectTab(n.link_tab);
     }
   };
 
@@ -97,7 +104,6 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             </div>
           )}
 
-          {/* Notification Bell Button & Counter */}
           <div className="relative">
             <button
               onClick={() => setShowNotifPanel(!showNotifPanel)}
@@ -116,7 +122,6 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
               )}
             </button>
 
-            {/* Notification Popover Panel */}
             {showNotifPanel && (
               <div className={`absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl border shadow-2xl p-4 z-50 ${
                 darkMode ? 'bg-stone-900 border-stone-800 text-white' : 'bg-white border-stone-200 text-stone-900'
@@ -124,7 +129,7 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
                 <div className="flex items-center justify-between border-b pb-2 mb-3 border-stone-100">
                   <div className="flex items-center gap-2">
                     <Megaphone className="w-4 h-4 text-rose-800" />
-                    <h4 className="font-bold text-xs">System Announcements</h4>
+                    <h4 className="font-bold text-xs">Notifications & Alerts</h4>
                   </div>
                   <button onClick={() => setShowNotifPanel(false)} className="text-stone-400 hover:text-stone-700">
                     <X className="w-4 h-4" />
@@ -140,7 +145,7 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
                     className="w-full mb-3 bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-2 rounded-xl text-xs transition-colors flex items-center justify-center gap-2"
                   >
                     <Send className="w-3.5 h-3.5" />
-                    <span>Broadcast New Notification</span>
+                    <span>Broadcast Notification</span>
                   </button>
                 )}
 
@@ -149,9 +154,13 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
                     <p className="text-xs text-center py-4 text-stone-400">No active notifications.</p>
                   ) : (
                     notifications.map((n) => (
-                      <div key={n.id} className={`p-3 rounded-xl border text-xs space-y-1 ${
-                        darkMode ? 'bg-stone-950 border-stone-800' : 'bg-stone-50 border-stone-200'
-                      }`}>
+                      <div
+                        key={n.id}
+                        onClick={() => handleNotificationClick(n)}
+                        className={`p-3 rounded-xl border text-xs space-y-1 cursor-pointer transition-all hover:scale-[1.01] ${
+                          darkMode ? 'bg-stone-950 border-stone-800 hover:bg-stone-800' : 'bg-stone-50 border-stone-200 hover:bg-rose-50/50'
+                        }`}
+                      >
                         <div className="flex items-center justify-between">
                           <strong className="font-bold text-rose-900">{n.title}</strong>
                           <span className="text-[9px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">
@@ -159,9 +168,16 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
                           </span>
                         </div>
                         <p className="text-stone-600 text-[11px] leading-relaxed">{n.message}</p>
-                        <span className="text-[9px] text-stone-400 block pt-1">
-                          By {n.created_by_name} • {new Date(n.created_at).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}
-                        </span>
+                        <div className="flex items-center justify-between pt-1">
+                          <span className="text-[9px] text-stone-400">
+                            By {n.created_by_name} • {new Date(n.created_at).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}
+                          </span>
+                          {n.link_tab && (
+                            <span className="text-[9px] font-bold text-rose-800 underline">
+                              View Section →
+                            </span>
+                          )}
+                        </div>
                       </div>
                     ))
                   )}
@@ -182,14 +198,13 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          {/* User Profile Pill */}
           <div className={`flex items-center gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border ${
             darkMode
               ? 'bg-stone-800 border-stone-700'
               : 'bg-stone-100 border-stone-200'
           }`}>
             <div className="w-6 h-6 bg-[#881337] text-white rounded-full flex items-center justify-center text-xs font-black shadow-xs shrink-0">
-              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'T'}
+              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
             </div>
             <div className="text-left hidden md:block">
               <span className={`text-xs font-bold block leading-tight truncate max-w-[120px] ${darkMode ? 'text-white' : 'text-stone-900'}`}>
@@ -201,7 +216,6 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             </div>
           </div>
 
-          {/* Functional Logout Button for Admin & Employees */}
           <button
             onClick={logout}
             title="Logout"
@@ -214,7 +228,6 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
 
       </header>
 
-      {/* Broadcast Notification Modal */}
       {showSendModal && (
         <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
@@ -237,7 +250,7 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Office Shift Update"
+                  placeholder="Title..."
                   value={notifForm.title}
                   onChange={(e) => setNotifForm({...notifForm, title: e.target.value})}
                   className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl"
@@ -262,7 +275,7 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
                 <textarea
                   rows="3"
                   required
-                  placeholder="Broadcast message details..."
+                  placeholder="Details..."
                   value={notifForm.message}
                   onChange={(e) => setNotifForm({...notifForm, message: e.target.value})}
                   className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl"

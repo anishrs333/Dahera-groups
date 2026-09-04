@@ -37,7 +37,7 @@ const MainLayout = () => {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center font-['Plus_Jakarta_Sans',sans-serif] ${darkMode ? 'bg-stone-950 text-white' : 'bg-[#FAF9F6] text-stone-900'}`}>
         <div className="w-10 h-10 border-4 border-rose-900 border-t-transparent rounded-full animate-spin mb-4" />
-        <span className="text-xs font-bold">Loading Thahira Groups System...</span>
+        <span className="text-xs font-bold">Loading...</span>
       </div>
     );
   }
@@ -52,6 +52,7 @@ const MainLayout = () => {
     }`}>
       <Navbar
         onMobileMenuToggle={() => setMobileOpen(!mobileOpen)}
+        onSelectTab={(tab) => setActiveTab(tab)}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
       />

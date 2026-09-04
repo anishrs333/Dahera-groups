@@ -7,6 +7,7 @@ from .models import SalarySlip
 from .serializers import SalarySlipSerializer
 from .utils import generate_salary_slip_pdf
 from users.permissions import IsAdminUserRole, IsSelfOrAdmin
+from users.models import Notification
 
 class SalarySlipViewSet(viewsets.ModelViewSet):
     serializer_class = SalarySlipSerializer
@@ -54,6 +55,19 @@ class SalarySlipViewSet(viewsets.ModelViewSet):
                 'status': 'PAID'
             }
         )
+
+        # Notify Employee when salary slip is generated
+        try:
+            Notification.objects.create(
+                recipient=emp,
+                title="Salary Slip Issued",
+                message=f"Your salary slip for {slip.get_month_name()} {slip.year} has been issued. Net take-home: ₹{slip.net_salary:,.2f}.",
+                target="EMPLOYEE",
+                link_tab="payroll",
+                created_by=request.user
+            )
+        except Exception:
+            pass
 
         return Response(
             SalarySlipSerializer(slip).data,
