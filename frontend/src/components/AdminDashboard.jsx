@@ -129,11 +129,12 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
     e.preventDefault();
     setAddMsg('');
     try {
+      const formattedEmail = (newEmp.email || newEmp.username || '').trim();
       const payload = {
         ...newEmp,
-        username: newEmp.email.trim(),
-        email: newEmp.email.trim(),
-        phone: newEmp.phone.trim()
+        username: formattedEmail,
+        email: formattedEmail,
+        phone: (newEmp.phone || '').trim()
       };
       await api.post('/users/employees/', payload);
       setShowAddModal(false);
@@ -587,7 +588,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                 <input
                   type="email"
                   required
-                  value={newEmp.username}
+                  value={newEmp.email}
                   onChange={(e) => setNewEmp({...newEmp, username: e.target.value, email: e.target.value})}
                   className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                 />

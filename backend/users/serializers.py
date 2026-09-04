@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+import uuid
 
 User = get_user_model()
 
@@ -26,6 +27,10 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.get_full_name() or obj.username
 
 class UserCreateUpdateSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    email = serializers.EmailField(required=False, allow_blank=True, allow_null=True)
+    first_name = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    last_name = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     password = serializers.CharField(write_only=True, required=False)
     employee_id = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
@@ -37,9 +42,35 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
             'phone', 'date_of_joining', 'bio', 'base_salary'
         ]
 
+    def validate(self, attrs):
+        # Auto-fill missing username or email
+        email_val = (attrs.get('email') or '').strip()
+        username_val = (attrs.get('username') or '').strip()
+
+        if not username_val and email_val:
+            username_val = email_val
+        elif not username_val:
+            first = (attrs.get('first_name') or 'emp').strip().lower()
+            username_val = f"{first}_{uuid.uuid4().hex[:6]}"
+
+        if not email_val:
+            if '@' in username_val:
+                email_val = username_val
+            else:
+                email_val = f"{username_val}@thahira.com"
+
+        attrs['username'] = username_val
+        attrs['email'] = email_val
+
+        # Ensure first_name
+        if not attrs.get('first_name'):
+            attrs['first_name'] = username_val.split('@')[0].capitalize()
+
+        return attrs
+
     def create(self, validated_data):
         provided_password = validated_data.pop('password', None)
-        phone_number = validated_data.get('phone', '').strip()
+        phone_number = (validated_data.get('phone') or '').strip()
         gender = validated_data.get('gender', 'MALE')
 
         # Auto-generate next unique sequential employee_id (THG-M-01, THG-M-02, THG-F-01...)
