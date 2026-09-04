@@ -10,6 +10,7 @@ export const BottomDock = ({ activeTab, setActiveTab, darkMode, setDarkMode }) =
 
   const adminDockItems = [
     { id: 'admin-dashboard', label: 'Overview', icon: LayoutDashboard },
+    { id: 'admin-attendance', label: 'Attendance', icon: UserCheck },
     { id: 'admin-employees', label: 'Directory', icon: Users },
     { id: 'admin-leaves', label: 'Leaves', icon: CalendarDays },
     { id: 'admin-payroll', label: 'Payslips', icon: Receipt },

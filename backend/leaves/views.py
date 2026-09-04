@@ -14,12 +14,11 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_admin_role:
-            return LeaveRequest.objects.all().select_related('employee').order_by('-created_at')
-        return LeaveRequest.objects.filter(employee=user).order_by('-created_at')
+            return LeaveRequest.objects.all().select_related('employee').order_by('-applied_on')
+        return LeaveRequest.objects.filter(employee=user).order_by('-applied_on')
 
     def perform_create(self, serializer):
         leave_obj = serializer.save(employee=self.request.user)
-        # Notify Admin when an employee submits a leave request
         try:
             Notification.objects.create(
                 title="New Leave Request",
@@ -28,7 +27,7 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
                 link_tab="admin-leaves",
                 created_by=self.request.user
             )
-        except Exception as e:
+        except Exception:
             pass
 
     @action(detail=True, methods=['post'], permission_classes=[IsAdminUserRole])
@@ -38,7 +37,6 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
         leave.admin_notes = request.data.get('admin_notes', 'Approved')
         leave.save()
 
-        # Notify Employee when leave is approved
         try:
             Notification.objects.create(
                 recipient=leave.employee,
@@ -60,7 +58,6 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
         leave.admin_notes = request.data.get('admin_notes', 'Rejected')
         leave.save()
 
-        # Notify Employee when leave is rejected
         try:
             Notification.objects.create(
                 recipient=leave.employee,

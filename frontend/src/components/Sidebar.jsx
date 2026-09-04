@@ -15,6 +15,7 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
 
   const adminNav = [
     { id: 'admin-dashboard', label: 'Overview', icon: LayoutDashboard },
+    { id: 'admin-attendance', label: 'Attendance Monitoring', icon: UserCheck },
     { id: 'admin-employees', label: 'Employee Directory', icon: Users },
     { id: 'admin-leaves', label: 'Leave Approvals', icon: CalendarDays },
     { id: 'admin-payroll', label: 'Payroll & Slips', icon: Receipt },
