@@ -402,51 +402,51 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
 
       {(subTab === 'admin-dashboard' || subTab === 'all') && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
-            <div>
-              <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Total Staff</span>
-              <span className="text-2xl font-black">{totalEmployees}</span>
-              <span className={`text-xs block mt-1 ${textMuted}`}>
+          <div className={`p-4 sm:p-5 rounded-2xl border shadow-sm flex items-center justify-between gap-3 overflow-hidden ${cardBg}`}>
+            <div className="min-w-0 flex-1">
+              <span className={`text-[11px] font-bold uppercase tracking-wider block truncate ${textMuted}`}>Total Staff</span>
+              <span className="text-xl sm:text-2xl font-black block truncate">{totalEmployees}</span>
+              <span className={`text-xs block mt-1 truncate ${textMuted}`}>
                 <strong className="text-rose-800">{maleCount}</strong> Male • <strong className="text-amber-800">{femaleCount}</strong> Female
               </span>
             </div>
-            <div className="p-3 bg-rose-50 text-rose-900 rounded-xl">
-              <Users className="w-6 h-6" />
+            <div className="p-3 bg-rose-50 text-rose-900 rounded-xl shrink-0">
+              <Users className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
           </div>
 
-          <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
-            <div>
-              <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Today's Attendance</span>
-              <span className="text-2xl font-black text-emerald-600">{presentCountToday} / {totalEmployees}</span>
-              <span className={`text-xs block mt-1 ${textMuted}`}>
+          <div className={`p-4 sm:p-5 rounded-2xl border shadow-sm flex items-center justify-between gap-3 overflow-hidden ${cardBg}`}>
+            <div className="min-w-0 flex-1">
+              <span className={`text-[11px] font-bold uppercase tracking-wider block truncate ${textMuted}`}>Today's Attendance</span>
+              <span className="text-xl sm:text-2xl font-black text-emerald-600 block truncate">{presentCountToday} / {totalEmployees}</span>
+              <span className={`text-xs block mt-1 truncate ${textMuted}`}>
                 <strong className="text-emerald-700">{presentCountToday} Present</strong> • <strong className="text-rose-800">{absentCountToday} Absent</strong>
               </span>
             </div>
-            <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl">
-              <UserCheck className="w-6 h-6" />
+            <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl shrink-0">
+              <UserCheck className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
           </div>
 
-          <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
-            <div>
-              <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Pending Leaves</span>
-              <span className="text-2xl font-black text-amber-600">{pendingLeaves}</span>
-              <span className={`text-xs block mt-1 ${textMuted}`}>Awaiting action</span>
+          <div className={`p-4 sm:p-5 rounded-2xl border shadow-sm flex items-center justify-between gap-3 overflow-hidden ${cardBg}`}>
+            <div className="min-w-0 flex-1">
+              <span className={`text-[11px] font-bold uppercase tracking-wider block truncate ${textMuted}`}>Pending Leaves</span>
+              <span className="text-xl sm:text-2xl font-black text-amber-600 block truncate">{pendingLeaves}</span>
+              <span className={`text-xs block mt-1 truncate ${textMuted}`}>Awaiting action</span>
             </div>
-            <div className="p-3 bg-amber-50 text-amber-700 rounded-xl">
-              <CalendarDays className="w-6 h-6" />
+            <div className="p-3 bg-amber-50 text-amber-700 rounded-xl shrink-0">
+              <CalendarDays className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
           </div>
 
-          <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
-            <div>
-              <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Monthly Payroll</span>
-              <span className="text-2xl font-black text-emerald-600">₹{totalPayroll.toLocaleString('en-IN')}</span>
-              <span className={`text-xs block mt-1 ${textMuted}`}>Issued total</span>
+          <div className={`p-4 sm:p-5 rounded-2xl border shadow-sm flex items-center justify-between gap-3 overflow-hidden ${cardBg}`}>
+            <div className="min-w-0 flex-1">
+              <span className={`text-[11px] font-bold uppercase tracking-wider block truncate ${textMuted}`}>Monthly Payroll</span>
+              <span className="text-xl sm:text-2xl font-black text-emerald-600 block truncate">₹{totalPayroll.toLocaleString('en-IN')}</span>
+              <span className={`text-xs block mt-1 truncate ${textMuted}`}>Issued total</span>
             </div>
-            <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl">
-              <IndianRupee className="w-6 h-6" />
+            <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl shrink-0">
+              <IndianRupee className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
           </div>
         </div>
