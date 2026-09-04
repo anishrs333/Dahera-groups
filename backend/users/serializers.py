@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 import uuid
 
+from .models import Notification
+
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
@@ -25,6 +27,19 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return obj.get_full_name() or obj.username
+
+class NotificationSerializer(serializers.ModelSerializer):
+    created_by_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Notification
+        fields = ['id', 'title', 'message', 'target', 'created_by', 'created_by_name', 'created_at', 'is_active']
+        read_only_fields = ['id', 'created_by', 'created_at']
+
+    def get_created_by_name(self, obj):
+        if obj.created_by:
+            return obj.created_by.get_full_name() or obj.created_by.username
+        return 'Admin'
 
 class UserCreateUpdateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=False, allow_blank=True, allow_null=True)

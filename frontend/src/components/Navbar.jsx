@@ -1,13 +1,55 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Building2, Clock, Menu, Sun, Moon, LogOut } from 'lucide-react';
+import api from '../services/api';
+import { Building2, Clock, Menu, Sun, Moon, LogOut, Bell, Send, X, AlertCircle, Megaphone } from 'lucide-react';
 
 export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
   const { user, logout } = useAuth();
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [showSendModal, setShowSendModal] = useState(false);
+
+  const [notifForm, setNotifForm] = useState({
+    title: '',
+    message: '',
+    target: 'ALL'
+  });
+  const [notifMsg, setNotifMsg] = useState('');
 
   const isAdmin = user?.role === 'ADMIN' || user?.is_superuser;
   const isMale = user?.gender === 'MALE';
   const scheduledTime = user?.scheduled_login_time || (isMale ? '10:00 AM' : '09:30 AM');
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get('/users/notifications/');
+      setNotifications(res.data.results || res.data);
+    } catch (err) {
+      console.error("Fetch notifications error:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 15000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const handleSendNotification = async (e) => {
+    e.preventDefault();
+    setNotifMsg('');
+    try {
+      await api.post('/users/notifications/', notifForm);
+      setNotifForm({ title: '', message: '', target: 'ALL' });
+      setShowSendModal(false);
+      fetchNotifications();
+      alert("Notification broadcasted successfully!");
+    } catch (err) {
+      setNotifMsg(err.response?.data?.detail || 'Error sending notification.');
+    }
+  };
 
   return (
     <div className="sticky top-2 sm:top-3 z-40 px-2 sm:px-6 lg:px-8 mb-4 sm:mb-6 font-['Plus_Jakarta_Sans',sans-serif]">
@@ -55,6 +97,79 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             </div>
           )}
 
+          {/* Notification Bell Button & Counter */}
+          <div className="relative">
+            <button
+              onClick={() => setShowNotifPanel(!showNotifPanel)}
+              title="Notifications"
+              className={`p-1.5 sm:p-2 rounded-full border transition-all duration-200 active:scale-95 relative ${
+                darkMode
+                  ? 'bg-stone-800 text-stone-200 border-stone-700 hover:bg-stone-700'
+                  : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
+              }`}
+            >
+              <Bell className="w-4 h-4" />
+              {notifications.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white rounded-full text-[9px] font-black flex items-center justify-center animate-pulse">
+                  {notifications.length}
+                </span>
+              )}
+            </button>
+
+            {/* Notification Popover Panel */}
+            {showNotifPanel && (
+              <div className={`absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl border shadow-2xl p-4 z-50 ${
+                darkMode ? 'bg-stone-900 border-stone-800 text-white' : 'bg-white border-stone-200 text-stone-900'
+              }`}>
+                <div className="flex items-center justify-between border-b pb-2 mb-3 border-stone-100">
+                  <div className="flex items-center gap-2">
+                    <Megaphone className="w-4 h-4 text-rose-800" />
+                    <h4 className="font-bold text-xs">System Announcements</h4>
+                  </div>
+                  <button onClick={() => setShowNotifPanel(false)} className="text-stone-400 hover:text-stone-700">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {isAdmin && (
+                  <button
+                    onClick={() => {
+                      setShowNotifPanel(false);
+                      setShowSendModal(true);
+                    }}
+                    className="w-full mb-3 bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-2 rounded-xl text-xs transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Broadcast New Notification</span>
+                  </button>
+                )}
+
+                <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                  {notifications.length === 0 ? (
+                    <p className="text-xs text-center py-4 text-stone-400">No active notifications.</p>
+                  ) : (
+                    notifications.map((n) => (
+                      <div key={n.id} className={`p-3 rounded-xl border text-xs space-y-1 ${
+                        darkMode ? 'bg-stone-950 border-stone-800' : 'bg-stone-50 border-stone-200'
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <strong className="font-bold text-rose-900">{n.title}</strong>
+                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">
+                            {n.target}
+                          </span>
+                        </div>
+                        <p className="text-stone-600 text-[11px] leading-relaxed">{n.message}</p>
+                        <span className="text-[9px] text-stone-400 block pt-1">
+                          By {n.created_by_name} • {new Date(n.created_at).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
           <button
             onClick={() => setDarkMode(!darkMode)}
             title="Toggle Theme"
@@ -67,13 +182,14 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
+          {/* User Profile Pill */}
           <div className={`flex items-center gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border ${
             darkMode
               ? 'bg-stone-800 border-stone-700'
               : 'bg-stone-100 border-stone-200'
           }`}>
             <div className="w-6 h-6 bg-[#881337] text-white rounded-full flex items-center justify-center text-xs font-black shadow-xs shrink-0">
-              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
+              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'T'}
             </div>
             <div className="text-left hidden md:block">
               <span className={`text-xs font-bold block leading-tight truncate max-w-[120px] ${darkMode ? 'text-white' : 'text-stone-900'}`}>
@@ -85,19 +201,94 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             </div>
           </div>
 
-          {!isAdmin && (
-            <button
-              onClick={logout}
-              title="Logout"
-              className="p-1.5 sm:p-2 rounded-full border border-stone-200 text-stone-500 hover:text-rose-900 hover:bg-rose-50 transition-all"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          )}
+          {/* Functional Logout Button for Admin & Employees */}
+          <button
+            onClick={logout}
+            title="Logout"
+            className="p-1.5 sm:p-2 rounded-full border border-stone-200 text-stone-500 hover:text-rose-900 hover:bg-rose-50 transition-all active:scale-95"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
 
         </div>
 
       </header>
+
+      {/* Broadcast Notification Modal */}
+      {showSendModal && (
+        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b pb-3 border-stone-100">
+              <h3 className="text-base font-bold text-stone-900">Broadcast Notification</h3>
+              <button onClick={() => setShowSendModal(false)} className="text-stone-400 hover:text-stone-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {notifMsg && (
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl">
+                {notifMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleSendNotification} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">Notification Title</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Office Shift Update"
+                  value={notifForm.title}
+                  onChange={(e) => setNotifForm({...notifForm, title: e.target.value})}
+                  className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">Target Audience</label>
+                <select
+                  value={notifForm.target}
+                  onChange={(e) => setNotifForm({...notifForm, target: e.target.value})}
+                  className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl"
+                >
+                  <option value="ALL">All Staff & Admin</option>
+                  <option value="EMPLOYEE">Employees Only</option>
+                  <option value="ADMIN">Admins Only</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">Message Content</label>
+                <textarea
+                  rows="3"
+                  required
+                  placeholder="Broadcast message details..."
+                  value={notifForm.message}
+                  onChange={(e) => setNotifForm({...notifForm, message: e.target.value})}
+                  className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl"
+                ></textarea>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setShowSendModal(false)}
+                  className="px-4 py-2 bg-stone-100 text-stone-700 font-bold rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#881337] text-white font-bold rounded-xl shadow-md"
+                >
+                  Broadcast
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

@@ -43,3 +43,23 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.get_full_name() or self.username} ({self.employee_id or 'N/A'})"
+
+
+class Notification(models.Model):
+    class Target(models.TextChoices):
+        ALL = 'ALL', 'All Users'
+        EMPLOYEE = 'EMPLOYEE', 'Employees Only'
+        ADMIN = 'ADMIN', 'Admins Only'
+
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    target = models.CharField(max_length=20, choices=Target.choices, default=Target.ALL)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_notifications')
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.title} ({self.target})"

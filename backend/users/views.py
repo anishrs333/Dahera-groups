@@ -4,12 +4,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 
+from .models import Notification
 from .serializers import (
     UserSerializer,
     UserCreateUpdateSerializer,
     ChangePasswordSerializer,
-    CustomTokenObtainPairSerializer
+    CustomTokenObtainPairSerializer,
+    NotificationSerializer
 )
 from .permissions import IsAdminUserRole, IsSelfOrAdmin
 
@@ -65,6 +68,27 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             'status': 'success',
             'message': f'Employee {user.get_full_name()} account has been reactivated.'
         })
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_admin_role:
+            return Notification.objects.filter(is_active=True).order_by('-created_at')
+        return Notification.objects.filter(
+            Q(target='ALL') | Q(target='EMPLOYEE'),
+            is_active=True
+        ).order_by('-created_at')
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAdminUserRole()]
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 class ChangePasswordView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
