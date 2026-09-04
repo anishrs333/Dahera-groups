@@ -10,70 +10,73 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
   const scheduledTime = user?.scheduled_login_time || (isMale ? '10:00 AM' : '09:30 AM');
 
   return (
-    <div className="sticky top-3 z-40 px-4 sm:px-6 lg:px-8 mb-6 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="sticky top-2 sm:top-3 z-40 px-2 sm:px-6 lg:px-8 mb-4 sm:mb-6 font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Floating Magnetic Dock Container */}
-      <header className={`max-w-7xl mx-auto rounded-full border transition-all duration-300 shadow-xl backdrop-blur-md px-6 h-16 flex items-center justify-between ${
+      <header className={`max-w-7xl mx-auto rounded-2xl sm:rounded-full border transition-all duration-300 shadow-lg backdrop-blur-md px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between ${
         darkMode
           ? 'bg-stone-900/90 border-stone-800 text-white shadow-rose-950/20'
           : 'bg-white/90 border-stone-200 text-stone-900 shadow-stone-300/40'
       }`}>
         
-        {/* Left: Brand & Mobile Menu Toggle */}
-        <div className="flex items-center gap-3">
+        {/* Left: Mobile Menu Toggle & Brand */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={onMobileMenuToggle}
-            className={`md:hidden p-2 rounded-full transition-transform hover:scale-110 ${
+            className={`md:hidden p-1.5 rounded-xl transition-transform active:scale-95 ${
               darkMode ? 'text-stone-300 hover:bg-stone-800' : 'text-stone-600 hover:bg-stone-100'
             }`}
+            aria-label="Toggle Navigation Menu"
           >
             <Menu className="w-5 h-5" />
           </button>
           
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="p-2 bg-[#881337] text-white rounded-full shadow-md transition-transform group-hover:scale-110 duration-200">
+          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer">
+            <div className="p-1.5 sm:p-2 bg-[#881337] text-white rounded-xl sm:rounded-full shadow-md shrink-0">
               <Building2 className="w-4 h-4" />
             </div>
             <div>
-              <span className={`font-black text-sm tracking-tight block leading-tight ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <span className={`font-black text-xs sm:text-sm tracking-tight block leading-tight ${darkMode ? 'text-white' : 'text-stone-900'}`}>
                 Thahira Groups
               </span>
-              <span className="text-[10px] text-rose-800 font-bold tracking-wider uppercase">ERP & Staff Portal</span>
+              <span className="text-[9px] sm:text-[10px] text-rose-800 font-bold tracking-wider uppercase block leading-none">
+                ERP Portal
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Right: Magnetic Dock Actions & User Controls */}
-        <div className="flex items-center gap-3 sm:gap-4">
+        {/* Right: Actions & Profile */}
+        <div className="flex items-center gap-2 sm:gap-3">
           
           {/* Shift Schedule Badge for Employees */}
           {!isAdmin && user && (
-            <div className={`hidden sm:flex items-center gap-1.5 px-3.5 py-1 rounded-full border text-xs font-bold transition-transform hover:scale-105 ${
+            <div className={`hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold ${
               darkMode
                 ? 'bg-stone-800 text-rose-300 border-stone-700'
                 : 'bg-rose-50 text-rose-900 border-rose-200'
             }`}>
               <Clock className="w-3.5 h-3.5 text-rose-800" />
-              <span>Shift Login: {scheduledTime}</span>
+              <span>Shift: {scheduledTime}</span>
             </div>
           )}
 
           {/* Admin Mode Badge */}
           {isAdmin && (
-            <div className={`hidden sm:flex items-center gap-1.5 px-3.5 py-1 rounded-full border text-xs font-bold transition-transform hover:scale-105 ${
+            <div className={`hidden sm:flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 rounded-full border text-[11px] sm:text-xs font-bold ${
               darkMode
                 ? 'bg-rose-950/80 text-rose-300 border-rose-800'
                 : 'bg-rose-50 text-rose-900 border-rose-200'
             }`}>
-              <Shield className="w-3.5 h-3.5 text-rose-800" />
-              <span>Admin Mode</span>
+              <Shield className="w-3.5 h-3.5 text-rose-800 shrink-0" />
+              <span className="truncate">Admin Mode</span>
             </div>
           )}
 
-          {/* Dark Mode / Light Mode Toggle Button */}
+          {/* Dark / Light Theme Toggle */}
           <button
             onClick={() => setDarkMode(!darkMode)}
             title="Toggle Dark/Light Mode"
-            className={`p-2 rounded-full border transition-all duration-200 hover:scale-110 ${
+            className={`p-1.5 sm:p-2 rounded-full border transition-all duration-200 active:scale-95 ${
               darkMode
                 ? 'bg-stone-800 text-amber-300 border-stone-700 hover:bg-stone-700'
                 : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
@@ -82,33 +85,33 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          {/* User Profile Badge */}
-          <div className={`flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border transition-transform hover:scale-105 ${
+          {/* User Profile Pill */}
+          <div className={`flex items-center gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border ${
             darkMode
               ? 'bg-stone-800 border-stone-700'
               : 'bg-stone-100 border-stone-200'
           }`}>
-            <div className="w-6 h-6 bg-[#881337] text-white rounded-full flex items-center justify-center text-xs font-black shadow-xs">
+            <div className="w-6 h-6 bg-[#881337] text-white rounded-full flex items-center justify-center text-xs font-black shadow-xs shrink-0">
               {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'T'}
             </div>
             <div className="text-left hidden md:block">
-              <span className={`text-xs font-bold block leading-tight ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <span className={`text-xs font-bold block leading-tight truncate max-w-[120px] ${darkMode ? 'text-white' : 'text-stone-900'}`}>
                 {user?.full_name || user?.username}
               </span>
-              <span className={`text-[9px] font-semibold uppercase ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
-                {user?.role} • {user?.employee_id || 'ID N/A'}
+              <span className={`text-[9px] font-semibold uppercase block ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
+                {user?.role}
               </span>
             </div>
           </div>
 
-          {/* Sign Out Button */}
+          {/* Sign Out */}
           <button
             onClick={logout}
             title="Sign Out"
-            className={`p-2 rounded-full border transition-all duration-200 hover:scale-110 ${
+            className={`p-1.5 sm:p-2 rounded-full border transition-all duration-200 active:scale-95 ${
               darkMode
-                ? 'text-stone-400 border-stone-800 hover:text-rose-400 hover:border-rose-900 hover:bg-rose-950/40'
-                : 'text-stone-400 border-stone-200 hover:text-rose-900 hover:border-rose-200 hover:bg-rose-50'
+                ? 'text-stone-400 border-stone-800 hover:text-rose-400 hover:bg-rose-950/40'
+                : 'text-stone-400 border-stone-200 hover:text-rose-900 hover:bg-rose-50'
             }`}
           >
             <RefreshCw className="w-4 h-4" />

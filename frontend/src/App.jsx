@@ -49,7 +49,7 @@ const MainLayout = () => {
         setDarkMode={setDarkMode}
       />
 
-      <div className="flex flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-1 max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8">
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -58,7 +58,7 @@ const MainLayout = () => {
           darkMode={darkMode}
         />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-full overflow-x-hidden">
+        <main className="flex-1 p-2 sm:p-6 lg:p-8 max-w-full overflow-x-hidden">
           {isAdmin ? (
             activeTab === 'attendance' ? (
               <EmployeeDashboard subTab="attendance" darkMode={darkMode} />

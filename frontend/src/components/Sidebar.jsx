@@ -29,7 +29,7 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
   };
 
   const navContent = (
-    <div className={`flex flex-col h-full justify-between py-5 border-r rounded-3xl transition-colors duration-300 ${
+    <div className={`flex flex-col h-full justify-between py-5 border-r rounded-2xl md:rounded-3xl transition-colors duration-300 ${
       darkMode ? 'bg-stone-900 border-stone-800 text-white' : 'bg-white border-stone-200 text-stone-900'
     }`}>
       <div>
@@ -37,7 +37,7 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
           <span className="text-[11px] font-extrabold text-rose-800 uppercase tracking-wider flex items-center gap-1.5">
             {isAdmin ? (
               <>
-                <Shield className="w-3.5 h-3.5 text-rose-800" />
+                <Shield className="w-3.5 h-3.5 text-rose-800 shrink-0" />
                 <span>Admin Command Center</span>
               </>
             ) : (
@@ -46,7 +46,7 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
           </span>
           <button
             onClick={() => setMobileOpen(false)}
-            className="md:hidden text-stone-400 hover:text-stone-700"
+            className="md:hidden p-1.5 text-stone-400 hover:text-stone-700 rounded-lg"
           >
             <X className="w-5 h-5" />
           </button>
@@ -68,8 +68,8 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
                       : 'text-stone-600 hover:bg-stone-100/80 hover:text-stone-900'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-stone-400'}`} />
-                <span>{item.label}</span>
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-stone-400'}`} />
+                <span className="truncate">{item.label}</span>
               </button>
             );
           })}
@@ -78,7 +78,7 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
 
       <div className={`px-5 pt-4 border-t text-xs ${darkMode ? 'border-stone-800 text-stone-500' : 'border-stone-100 text-stone-400'}`}>
         <p className={`font-bold ${darkMode ? 'text-stone-300' : 'text-stone-800'}`}>Thahira Groups ERP v1.0</p>
-        <p className="text-[11px]">User-Friendly Enterprise Suite</p>
+        <p className="text-[11px]">Mobile Responsive Suite</p>
       </div>
     </div>
   );
@@ -94,13 +94,13 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 bg-stone-950/50 backdrop-blur-xs z-40 md:hidden"
+          className="fixed inset-0 bg-stone-950/60 backdrop-blur-xs z-50 md:hidden transition-opacity"
         />
       )}
 
       {/* Mobile Drawer Panel */}
       <div
-        className={`fixed top-0 left-0 bottom-0 w-64 z-50 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl ${
+        className={`fixed top-0 left-0 bottom-0 w-72 max-w-[85vw] bg-white z-50 transform transition-transform duration-300 ease-out md:hidden shadow-2xl ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
