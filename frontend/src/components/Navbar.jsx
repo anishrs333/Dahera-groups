@@ -59,14 +59,14 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
   };
 
   return (
-    <div className="sticky top-2 sm:top-3 z-40 px-2 sm:px-6 lg:px-8 mb-4 sm:mb-6 font-['Plus_Jakarta_Sans',sans-serif]">
-      <header className={`max-w-7xl mx-auto rounded-2xl sm:rounded-full border transition-all duration-300 shadow-lg backdrop-blur-md px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between ${
+    <div className="sticky top-1 sm:top-3 z-40 px-1 sm:px-6 lg:px-8 mb-3 sm:mb-6 font-['Plus_Jakarta_Sans',sans-serif]">
+      <header className={`max-w-7xl mx-auto rounded-2xl sm:rounded-full border transition-all duration-300 shadow-lg backdrop-blur-md px-2.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between ${
         darkMode
           ? 'bg-stone-900/90 border-stone-800 text-white shadow-rose-950/20'
           : 'bg-white/90 border-stone-200 text-stone-900 shadow-stone-300/40'
       }`}>
         
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           <button
             onClick={onMobileMenuToggle}
             className={`md:hidden p-1.5 rounded-xl transition-transform active:scale-95 ${
@@ -92,7 +92,7 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           {!isAdmin && user && (
             <div className={`hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold ${
               darkMode
@@ -123,7 +123,7 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
             </button>
 
             {showNotifPanel && (
-              <div className={`absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl border shadow-2xl p-4 z-50 ${
+              <div className={`absolute right-0 mt-3 w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-2xl border shadow-2xl p-3.5 sm:p-4 z-50 ${
                 darkMode ? 'bg-stone-900 border-stone-800 text-white' : 'bg-white border-stone-200 text-stone-900'
               }`}>
                 <div className="flex items-center justify-between border-b pb-2 mb-3 border-stone-100">
@@ -131,7 +131,7 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
                     <Megaphone className="w-4 h-4 text-rose-800" />
                     <h4 className="font-bold text-xs">Notifications & Alerts</h4>
                   </div>
-                  <button onClick={() => setShowNotifPanel(false)} className="text-stone-400 hover:text-stone-700">
+                  <button onClick={() => setShowNotifPanel(false)} className="text-stone-400 hover:text-stone-700 p-1">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -161,16 +161,16 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
                           darkMode ? 'bg-stone-950 border-stone-800 hover:bg-stone-800' : 'bg-stone-50 border-stone-200 hover:bg-rose-50/50'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <strong className="font-bold text-rose-900">{n.title}</strong>
-                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">
+                        <div className="flex items-center justify-between gap-1">
+                          <strong className="font-bold text-rose-900 truncate">{n.title}</strong>
+                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold shrink-0">
                             {n.target}
                           </span>
                         </div>
-                        <p className="text-stone-600 text-[11px] leading-relaxed">{n.message}</p>
+                        <p className="text-stone-600 text-[11px] leading-relaxed line-clamp-2">{n.message}</p>
                         <div className="flex items-center justify-between pt-1">
                           <span className="text-[9px] text-stone-400">
-                            By {n.created_by_name} • {new Date(n.created_at).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}
+                            {new Date(n.created_at).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}
                           </span>
                           {n.link_tab && (
                             <span className="text-[9px] font-bold text-rose-800 underline">
@@ -198,16 +198,16 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          <div className={`flex items-center gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border ${
+          <div className={`flex items-center gap-1.5 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-full border ${
             darkMode
               ? 'bg-stone-800 border-stone-700'
               : 'bg-stone-100 border-stone-200'
           }`}>
             <div className="w-6 h-6 bg-[#881337] text-white rounded-full flex items-center justify-center text-xs font-black shadow-xs shrink-0">
-              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
+              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}
             </div>
             <div className="text-left hidden md:block">
-              <span className={`text-xs font-bold block leading-tight truncate max-w-[120px] ${darkMode ? 'text-white' : 'text-stone-900'}`}>
+              <span className={`text-xs font-bold block leading-tight truncate max-w-[100px] lg:max-w-[120px] ${darkMode ? 'text-white' : 'text-stone-900'}`}>
                 {user?.full_name || user?.username}
               </span>
               <span className={`text-[9px] font-semibold uppercase block ${darkMode ? 'text-stone-400' : 'text-stone-500'}`}>
@@ -219,7 +219,7 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
           <button
             onClick={logout}
             title="Logout"
-            className="p-1.5 sm:p-2 rounded-full border border-stone-200 text-stone-500 hover:text-rose-900 hover:bg-rose-50 transition-all active:scale-95"
+            className="p-1.5 sm:p-2 rounded-full border border-stone-200 text-stone-500 hover:text-rose-900 hover:bg-rose-50 transition-all active:scale-95 shrink-0"
           >
             <LogOut className="w-4 h-4" />
           </button>
@@ -229,11 +229,11 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
       </header>
 
       {showSendModal && (
-        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3 border-stone-100">
               <h3 className="text-base font-bold text-stone-900">Broadcast Notification</h3>
-              <button onClick={() => setShowSendModal(false)} className="text-stone-400 hover:text-stone-700">
+              <button onClick={() => setShowSendModal(false)} className="text-stone-400 hover:text-stone-700 p-1">
                 <X className="w-5 h-5" />
               </button>
             </div>
