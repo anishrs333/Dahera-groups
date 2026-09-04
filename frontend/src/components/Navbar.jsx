@@ -11,21 +11,19 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
 
   return (
     <div className="sticky top-2 sm:top-3 z-40 px-2 sm:px-6 lg:px-8 mb-4 sm:mb-6 font-['Plus_Jakarta_Sans',sans-serif]">
-      {/* Floating Magnetic Dock Container */}
       <header className={`max-w-7xl mx-auto rounded-2xl sm:rounded-full border transition-all duration-300 shadow-lg backdrop-blur-md px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between ${
         darkMode
           ? 'bg-stone-900/90 border-stone-800 text-white shadow-rose-950/20'
           : 'bg-white/90 border-stone-200 text-stone-900 shadow-stone-300/40'
       }`}>
         
-        {/* Left: Mobile Menu Toggle & Brand */}
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={onMobileMenuToggle}
             className={`md:hidden p-1.5 rounded-xl transition-transform active:scale-95 ${
               darkMode ? 'text-stone-300 hover:bg-stone-800' : 'text-stone-600 hover:bg-stone-100'
             }`}
-            aria-label="Toggle Navigation Menu"
+            aria-label="Toggle Menu"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -39,16 +37,13 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
                 Thahira Groups
               </span>
               <span className="text-[9px] sm:text-[10px] text-rose-800 font-bold tracking-wider uppercase block leading-none">
-                ERP Portal
+                Portal
               </span>
             </div>
           </div>
         </div>
 
-        {/* Right: Actions & Profile */}
         <div className="flex items-center gap-2 sm:gap-3">
-          
-          {/* Shift Schedule Badge for Employees */}
           {!isAdmin && user && (
             <div className={`hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold ${
               darkMode
@@ -60,7 +55,6 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             </div>
           )}
 
-          {/* Admin Mode Badge */}
           {isAdmin && (
             <div className={`hidden sm:flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 rounded-full border text-[11px] sm:text-xs font-bold ${
               darkMode
@@ -68,14 +62,13 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
                 : 'bg-rose-50 text-rose-900 border-rose-200'
             }`}>
               <Shield className="w-3.5 h-3.5 text-rose-800 shrink-0" />
-              <span className="truncate">Admin Mode</span>
+              <span className="truncate">Admin</span>
             </div>
           )}
 
-          {/* Dark / Light Theme Toggle */}
           <button
             onClick={() => setDarkMode(!darkMode)}
-            title="Toggle Dark/Light Mode"
+            title="Toggle Theme"
             className={`p-1.5 sm:p-2 rounded-full border transition-all duration-200 active:scale-95 ${
               darkMode
                 ? 'bg-stone-800 text-amber-300 border-stone-700 hover:bg-stone-700'
@@ -85,7 +78,6 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          {/* User Profile Pill */}
           <div className={`flex items-center gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border ${
             darkMode
               ? 'bg-stone-800 border-stone-700'
@@ -104,10 +96,9 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             </div>
           </div>
 
-          {/* Sign Out */}
           <button
             onClick={logout}
-            title="Sign Out"
+            title="Logout"
             className={`p-1.5 sm:p-2 rounded-full border transition-all duration-200 active:scale-95 ${
               darkMode
                 ? 'text-stone-400 border-stone-800 hover:text-rose-400 hover:bg-rose-950/40'

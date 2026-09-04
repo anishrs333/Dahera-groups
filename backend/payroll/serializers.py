@@ -20,10 +20,10 @@ class SalarySlipSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'days_in_month', 'daily_rate', 'leave_deduction_amount', 'net_salary', 'generated_at', 'updated_at']
 
-    def get_month_name(self, obj) -> str:
+    def get_month_name(self, obj):
         return obj.get_month_name()
 
-    def get_scheduled_login_time(self, obj) -> str:
+    def get_scheduled_login_time(self, obj):
         if obj.employee:
             return obj.employee.get_scheduled_login_time()
         return "10:00 AM"

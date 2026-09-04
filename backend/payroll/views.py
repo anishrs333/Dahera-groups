@@ -7,7 +7,6 @@ from .models import SalarySlip
 from .serializers import SalarySlipSerializer
 from .utils import generate_salary_slip_pdf
 from users.permissions import IsAdminUserRole, IsSelfOrAdmin
-from leaves.models import LeaveRequest
 
 class SalarySlipViewSet(viewsets.ModelViewSet):
     serializer_class = SalarySlipSerializer
@@ -27,7 +26,6 @@ class SalarySlipViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         
-        # Clean blank string numbers to '0'
         for field in ['allowances', 'deductions', 'leave_days_deducted', 'basic_salary']:
             val = data.get(field)
             if val is None or str(val).strip() == '':
@@ -44,7 +42,6 @@ class SalarySlipViewSet(viewsets.ModelViewSet):
         deductions = serializer.validated_data.get('deductions', 0) or 0
         leave_days_deducted = serializer.validated_data.get('leave_days_deducted', 0) or 0
 
-        # Update or create to prevent unique constraint error when re-issuing payslip
         slip, created = SalarySlip.objects.update_or_create(
             employee=emp,
             month=month,
@@ -67,7 +64,7 @@ class SalarySlipViewSet(viewsets.ModelViewSet):
     def download_pdf(self, request, pk=None):
         salary_slip = self.get_object()
         pdf_bytes = generate_salary_slip_pdf(salary_slip)
-        filename = f"Thahira_Salary_Slip_{salary_slip.employee.employee_id or salary_slip.employee.id}_{salary_slip.get_month_name()}_{salary_slip.year}.pdf"
+        filename = f"Salary_Slip_{salary_slip.employee.employee_id or salary_slip.employee.id}_{salary_slip.get_month_name()}_{salary_slip.year}.pdf"
 
         response = HttpResponse(pdf_bytes, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'

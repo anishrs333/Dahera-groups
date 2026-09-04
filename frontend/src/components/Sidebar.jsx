@@ -14,11 +14,11 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
   ];
 
   const adminNav = [
-    { id: 'admin-dashboard', label: 'Admin Executive Overview', icon: LayoutDashboard },
+    { id: 'admin-dashboard', label: 'Overview', icon: LayoutDashboard },
     { id: 'admin-employees', label: 'Employee Directory', icon: Users },
-    { id: 'admin-leaves', label: 'Leave Approvals Queue', icon: CalendarDays },
-    { id: 'admin-payroll', label: 'Payroll & Salary Slips', icon: Receipt },
-    { id: 'attendance', label: 'My Personal Attendance', icon: UserCheck },
+    { id: 'admin-leaves', label: 'Leave Approvals', icon: CalendarDays },
+    { id: 'admin-payroll', label: 'Payroll & Slips', icon: Receipt },
+    { id: 'attendance', label: 'My Attendance', icon: UserCheck },
   ];
 
   const navItems = isAdmin ? adminNav : employeeNav;
@@ -38,7 +38,7 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
             {isAdmin ? (
               <>
                 <Shield className="w-3.5 h-3.5 text-rose-800 shrink-0" />
-                <span>Admin Command Center</span>
+                <span>Admin Console</span>
               </>
             ) : (
               <span>Employee Portal</span>
@@ -77,20 +77,17 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
       </div>
 
       <div className={`px-5 pt-4 border-t text-xs ${darkMode ? 'border-stone-800 text-stone-500' : 'border-stone-100 text-stone-400'}`}>
-        <p className={`font-bold ${darkMode ? 'text-stone-300' : 'text-stone-800'}`}>Thahira Groups ERP v1.0</p>
-        <p className="text-[11px]">Mobile Responsive Suite</p>
+        <p className={`font-bold ${darkMode ? 'text-stone-300' : 'text-stone-800'}`}>Thahira Groups</p>
       </div>
     </div>
   );
 
   return (
     <>
-      {/* Desktop Sidebar */}
       <aside className="hidden md:block w-64 min-h-[calc(100vh-6rem)] shrink-0">
         {navContent}
       </aside>
 
-      {/* Mobile Drawer Backdrop */}
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
@@ -98,7 +95,6 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
         />
       )}
 
-      {/* Mobile Drawer Panel */}
       <div
         className={`fixed top-0 left-0 bottom-0 w-72 max-w-[85vw] bg-white z-50 transform transition-transform duration-300 ease-out md:hidden shadow-2xl ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'

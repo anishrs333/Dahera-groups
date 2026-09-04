@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { Clock, UserCheck, CalendarDays, Receipt, Download, Send, Lock, KeyRound, CheckCircle, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Clock, UserCheck, CalendarDays, Receipt, Download, Send, Lock, KeyRound, CheckCircle } from 'lucide-react';
 
 export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) => {
   const { user } = useAuth();
 
-  // Attendance state
   const [todayAttendance, setTodayAttendance] = useState(null);
   const [attendanceLogs, setAttendanceLogs] = useState([]);
   const [clockTime, setClockTime] = useState(new Date().toLocaleTimeString());
 
-  // Leave state
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [leaveForm, setLeaveForm] = useState({
     leave_type: 'CASUAL',
@@ -21,18 +19,15 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
   });
   const [leaveMsg, setLeaveMsg] = useState('');
 
-  // Salary slip state
   const [salarySlips, setSalarySlips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState(null);
 
-  // Change Password state
   const [passForm, setPassForm] = useState({ old_password: '', new_password: '' });
   const [passMsg, setPassMsg] = useState('');
   const [passError, setPassError] = useState('');
   const [passLoading, setPassLoading] = useState(false);
 
-  // Live Clock Effect
   useEffect(() => {
     const timer = setInterval(() => setClockTime(new Date().toLocaleTimeString()), 1000);
     return () => clearInterval(timer);
@@ -52,7 +47,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
       setLeaveRequests(leavesRes.data.results || leavesRes.data);
       setSalarySlips(slipsRes.data.results || slipsRes.data);
     } catch (err) {
-      console.error("Employee dashboard error:", err);
+      console.error("Dashboard fetch error:", err);
     } finally {
       setLoading(false);
     }
@@ -86,7 +81,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
     try {
       await api.post('/leaves/', leaveForm);
       setLeaveForm({ leave_type: 'CASUAL', start_date: '', end_date: '', reason: '' });
-      setLeaveMsg('Leave application submitted successfully!');
+      setLeaveMsg('Leave application submitted successfully.');
       fetchData();
     } catch (err) {
       setLeaveMsg(err.response?.data?.detail || 'Error submitting leave request.');
@@ -100,16 +95,15 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
     setPassLoading(true);
     try {
       const res = await api.post('/users/change-password/', passForm);
-      setPassMsg(res.data.message || 'Password changed successfully!');
+      setPassMsg(res.data.message || 'Password changed successfully.');
       setPassForm({ old_password: '', new_password: '' });
     } catch (err) {
-      setPassError(err.response?.data?.detail || 'Error changing password. Verify current password.');
+      setPassError(err.response?.data?.detail || 'Error changing password.');
     } finally {
       setPassLoading(false);
     }
   };
 
-  // Robust PDF Blob Download with Error Parsing & Anchor Trigger
   const handleDownloadPdf = async (slipId, monthName, year, employeeId) => {
     setDownloadingId(slipId);
     try {
@@ -117,7 +111,6 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
         responseType: 'blob',
       });
       
-      // Check if response blob is actually a JSON error payload
       if (response.data.type && response.data.type.includes('json')) {
         const errorText = await response.data.text();
         const json = JSON.parse(errorText);
@@ -129,22 +122,13 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `Thahira_Salary_Slip_${employeeId || 'EMP'}_${monthName}_${year}.pdf`);
+      link.setAttribute('download', `Salary_Slip_${employeeId || 'EMP'}_${monthName}_${year}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
       setTimeout(() => window.URL.revokeObjectURL(url), 1000);
     } catch (err) {
-      console.error("PDF download error:", err);
-      if (err.response && err.response.data instanceof Blob) {
-        try {
-          const text = await err.response.data.text();
-          const json = JSON.parse(text);
-          alert(json.detail || "Failed to download PDF salary slip.");
-          return;
-        } catch (e) {}
-      }
-      alert("Failed to download PDF salary slip.");
+      alert("Failed to download PDF.");
     } finally {
       setDownloadingId(null);
     }
@@ -157,7 +141,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
     return (
       <div className="p-8 text-center flex flex-col items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-4 border-rose-900 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <span className={darkMode ? 'text-stone-400' : 'text-stone-500'}>Loading Thahira Employee Portal...</span>
+        <span className={darkMode ? 'text-stone-400' : 'text-stone-500'}>Loading...</span>
       </div>
     );
   }
@@ -169,11 +153,8 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
   return (
     <div className="space-y-6 font-['Plus_Jakarta_Sans',sans-serif]">
 
-      {/* Employee Bio Card */}
       {(subTab === 'dashboard' || subTab === 'all') && (
         <div className={`rounded-3xl border shadow-sm overflow-hidden ${cardBg}`}>
-          
-          {/* Top Banner */}
           <div className="p-6 md:p-8 bg-gradient-to-r from-[#4C0519] via-[#881337] to-[#991B1B] text-white">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               
@@ -189,23 +170,22 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                     </span>
                   </div>
                   <p className="text-rose-100 text-xs mt-1">
-                    {user?.designation} • {user?.department} • ID: <strong className="text-white font-mono">{user?.employee_id || 'THG-EMP'}</strong>
+                    {user?.designation} • {user?.department} • ID: <strong className="text-white font-mono">{user?.employee_id || 'N/A'}</strong>
                   </p>
                 </div>
               </div>
 
-              {/* Shift Schedule Banner */}
               <div className="bg-black/20 backdrop-blur border border-white/20 p-4 rounded-2xl flex items-center gap-4">
                 <div className="p-3 bg-white/10 rounded-xl text-rose-200">
                   <Clock className="w-7 h-7" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold tracking-wider uppercase text-rose-200 block">Scheduled Shift Login</span>
+                  <span className="text-[10px] font-bold tracking-wider uppercase text-rose-200 block">Shift Schedule</span>
                   <span className="text-2xl font-black text-white tracking-tight">
                     {scheduledTime}
                   </span>
                   <span className="text-[10px] text-rose-200 font-semibold block">
-                    {isMale ? 'Shift Schedule: 10:00 AM' : 'Shift Schedule: 9:30 AM'}
+                    {isMale ? 'Male Shift: 10:00 AM' : 'Female Shift: 09:30 AM'}
                   </span>
                 </div>
               </div>
@@ -213,7 +193,6 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
             </div>
           </div>
 
-          {/* Bio Grid */}
           <div className={`p-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs border-t ${darkMode ? 'bg-stone-950 border-stone-800' : 'bg-stone-50/60 border-stone-100'}`}>
             <div className={`p-4 rounded-2xl border ${cardBg}`}>
               <span className={`${textMuted} font-bold uppercase block mb-1`}>Email Address</span>
@@ -224,22 +203,20 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
               <span className="font-bold text-sm">{user?.date_of_joining || 'Jan 15, 2023'}</span>
             </div>
             <div className={`p-4 rounded-2xl border ${cardBg}`}>
-              <span className={`${textMuted} font-bold uppercase block mb-1`}>Professional Bio</span>
-              <span className="font-medium leading-relaxed block">{user?.bio || 'Thahira Groups Employee'}</span>
+              <span className={`${textMuted} font-bold uppercase block mb-1`}>Bio Notes</span>
+              <span className="font-medium leading-relaxed block">{user?.bio || 'Staff Member'}</span>
             </div>
           </div>
-
         </div>
       )}
 
-      {/* Change Password Portal Section */}
       {(subTab === 'dashboard' || subTab === 'all') && (
         <div className={`p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
           <div className="flex items-center gap-2 border-b pb-3 border-stone-200">
             <KeyRound className="w-5 h-5 text-rose-800" />
             <div>
-              <h2 className="text-base font-bold">Change Portal Password</h2>
-              <p className={`text-xs ${textMuted}`}>Update your password from your initial Mobile Number password.</p>
+              <h2 className="text-base font-bold">Change Password</h2>
+              <p className={`text-xs ${textMuted}`}>Update account password.</p>
             </div>
           </div>
 
@@ -258,7 +235,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
 
           <form onSubmit={handleChangePasswordSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
             <div>
-              <label className="block font-bold mb-1">Current Password (Mobile Number)</label>
+              <label className="block font-bold mb-1">Current Password</label>
               <input
                 type="password"
                 required
@@ -293,24 +270,21 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
         </div>
       )}
 
-      {/* Attendance Console */}
       {(subTab === 'dashboard' || subTab === 'attendance') && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Check In / Out Console */}
           <div className={`p-6 rounded-3xl border shadow-sm flex flex-col justify-between space-y-4 ${cardBg}`}>
             <div>
               <div className="flex items-center justify-between mb-3">
-                <span className={`text-xs font-bold uppercase tracking-wider ${textMuted}`}>Attendance Console</span>
+                <span className={`text-xs font-bold uppercase tracking-wider ${textMuted}`}>Daily Check-In</span>
                 <span className="text-xs font-bold px-2.5 py-0.5 bg-rose-50 text-rose-900 border border-rose-200 rounded-full">
                   {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                 </span>
               </div>
               
               <div className="text-center py-5 bg-[#881337] text-white rounded-2xl my-2 shadow-lg shadow-rose-950/20">
-                <span className="text-xs text-rose-200 font-bold tracking-wider uppercase block">Live Clock</span>
+                <span className="text-xs text-rose-200 font-bold tracking-wider uppercase block">Current Time</span>
                 <span className="text-3xl font-black font-mono text-white tracking-tight">{clockTime}</span>
-                <span className="text-[11px] text-rose-100 block mt-1">Scheduled Shift: <strong className="text-white">{scheduledTime}</strong></span>
+                <span className="text-[11px] text-rose-100 block mt-1">Shift Schedule: <strong className="text-white">{scheduledTime}</strong></span>
               </div>
 
               {todayAttendance ? (
@@ -324,11 +298,11 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                   <div className={`flex justify-between p-2.5 rounded-xl border ${innerBg}`}>
                     <span className={textMuted}>Check-out:</span>
                     <span className="font-bold">
-                      {todayAttendance.check_out ? new Date(todayAttendance.check_out).toLocaleTimeString() : 'Pending Check-Out'}
+                      {todayAttendance.check_out ? new Date(todayAttendance.check_out).toLocaleTimeString() : 'Pending'}
                     </span>
                   </div>
                   <div className={`flex justify-between p-2.5 rounded-xl border ${innerBg}`}>
-                    <span className={textMuted}>Arrival Status:</span>
+                    <span className={textMuted}>Status:</span>
                     <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${
                       todayAttendance.status === 'LATE' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                     }`}>
@@ -337,7 +311,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                   </div>
                 </div>
               ) : (
-                <p className={`text-xs text-center py-2 ${textMuted}`}>No check-in record for today yet.</p>
+                <p className={`text-xs text-center py-2 ${textMuted}`}>No record for today yet.</p>
               )}
             </div>
 
@@ -362,25 +336,24 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
             </div>
           </div>
 
-          {/* Attendance Log History */}
           <div className={`md:col-span-2 p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
-            <h2 className="text-base font-bold border-b border-stone-100 pb-3">My Attendance Log History</h2>
+            <h2 className="text-base font-bold border-b border-stone-100 pb-3">Attendance History</h2>
             
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className={`border-b text-[11px] font-bold uppercase ${darkMode ? 'border-stone-800 text-stone-400 bg-stone-950' : 'border-stone-200 text-stone-500 bg-stone-50'}`}>
                     <th className="py-3 px-3">Date</th>
-                    <th className="py-3 px-3">Scheduled Shift</th>
+                    <th className="py-3 px-3">Shift Time</th>
                     <th className="py-3 px-3">Check In</th>
                     <th className="py-3 px-3">Check Out</th>
                     <th className="py-3 px-3">Status</th>
-                    <th className="py-3 px-3">Working Hrs</th>
+                    <th className="py-3 px-3">Hours</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100 text-xs">
                   {attendanceLogs.length === 0 ? (
-                    <tr><td colSpan="6" className={`py-4 text-center ${textMuted}`}>No attendance logs recorded.</td></tr>
+                    <tr><td colSpan="6" className={`py-4 text-center ${textMuted}`}>No records found.</td></tr>
                   ) : (
                     attendanceLogs.map((log) => (
                       <tr key={log.id} className="hover:bg-stone-50/80 transition-colors">
@@ -407,19 +380,15 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
               </table>
             </div>
           </div>
-
         </div>
       )}
 
-      {/* Leave Application Portal */}
       {(subTab === 'dashboard' || subTab === 'leaves') && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Apply Form */}
           <div className={`p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
             <div>
               <h2 className="text-base font-bold">Apply for Leave</h2>
-              <p className={`text-xs mt-0.5 ${textMuted}`}>Submit request for HR administrator review.</p>
+              <p className={`text-xs mt-0.5 ${textMuted}`}>Submit leave application for approval.</p>
             </div>
 
             {leaveMsg && (
@@ -467,11 +436,11 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
               </div>
 
               <div>
-                <label className="block font-bold mb-1">Reason for Leave</label>
+                <label className="block font-bold mb-1">Reason</label>
                 <textarea
                   rows="3"
                   required
-                  placeholder="Detailed explanation..."
+                  placeholder="Reason for leave..."
                   value={leaveForm.reason}
                   onChange={(e) => setLeaveForm({...leaveForm, reason: e.target.value})}
                   className={`w-full p-2.5 rounded-xl border ${innerBg}`}
@@ -483,14 +452,13 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                 className="w-full bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-3 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                <span>Submit Leave Request</span>
+                <span>Submit Request</span>
               </button>
             </form>
           </div>
 
-          {/* Leave History Table */}
           <div className={`lg:col-span-2 p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
-            <h2 className="text-base font-bold border-b border-stone-100 pb-3">My Leave Application History</h2>
+            <h2 className="text-base font-bold border-b border-stone-100 pb-3">My Leave Requests</h2>
             
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -500,12 +468,12 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                     <th className="py-3 px-3">Dates</th>
                     <th className="py-3 px-3">Reason</th>
                     <th className="py-3 px-3">Status</th>
-                    <th className="py-3 px-3">Admin Remarks</th>
+                    <th className="py-3 px-3">Remarks</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100 text-xs">
                   {leaveRequests.length === 0 ? (
-                    <tr><td colSpan="5" className={`py-4 text-center ${textMuted}`}>No leave applications submitted yet.</td></tr>
+                    <tr><td colSpan="5" className={`py-4 text-center ${textMuted}`}>No requests submitted yet.</td></tr>
                   ) : (
                     leaveRequests.map((req) => (
                       <tr key={req.id} className="hover:bg-stone-50/80 transition-colors">
@@ -532,25 +500,20 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
               </table>
             </div>
           </div>
-
         </div>
       )}
 
-      {/* Salary Slips & Calendar Deductions Portal */}
       {(subTab === 'dashboard' || subTab === 'payroll') && (
         <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
             <div>
               <h2 className="text-lg font-bold">My Salary Slips</h2>
-              <p className={`text-xs mt-0.5 ${textMuted}`}>Official earnings statements with month calendar rate calculations and 1-click PDF download.</p>
+              <p className={`text-xs mt-0.5 ${textMuted}`}>Monthly earnings statements and PDF downloads.</p>
             </div>
-            <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full w-fit">
-              Calendar & Payroll Verified
-            </span>
           </div>
 
           {salarySlips.length === 0 ? (
-            <p className={`text-sm text-center py-6 ${textMuted}`}>No salary slips generated yet.</p>
+            <p className={`text-sm text-center py-6 ${textMuted}`}>No salary slips found.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {salarySlips.map((slip) => (
@@ -558,17 +521,16 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-base font-bold block">{slip.month_name} {slip.year} Payslip</span>
-                      <span className={`text-xs ${textMuted}`}>Scheduled Shift: <strong className="text-rose-900">{scheduledTime}</strong></span>
+                      <span className={`text-xs ${textMuted}`}>Shift Schedule: <strong className="text-rose-900">{scheduledTime}</strong></span>
                     </div>
                     <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
                       {slip.status}
                     </span>
                   </div>
 
-                  {/* Calendar Breakdown Details Box */}
                   <div className="p-3 bg-rose-50/70 border border-rose-200 rounded-xl text-xs space-y-1">
                     <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-stone-600 font-medium">Month Calendar Days:</span>
+                      <span className="text-stone-600 font-medium">Month Days:</span>
                       <strong className="text-stone-900">{slip.days_in_month || 30} Days</strong>
                     </div>
                     <div className="flex justify-between items-center text-[11px]">
@@ -598,8 +560,6 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
 
                   <div className="pt-2 flex items-center justify-between border-t border-stone-200/60">
                     <span className={`text-[11px] ${textMuted}`}>Issued: {new Date(slip.generated_at).toLocaleDateString()}</span>
-                    
-                    {/* PDF Download Button */}
                     <button
                       type="button"
                       disabled={downloadingId === slip.id}

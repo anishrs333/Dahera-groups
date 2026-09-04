@@ -12,13 +12,13 @@ export const BottomDock = ({ activeTab, setActiveTab, darkMode, setDarkMode }) =
     { id: 'admin-dashboard', label: 'Overview', icon: LayoutDashboard },
     { id: 'admin-employees', label: 'Directory', icon: Users },
     { id: 'admin-leaves', label: 'Leaves', icon: CalendarDays },
-    { id: 'admin-payroll', label: 'Salary Slips', icon: Receipt },
+    { id: 'admin-payroll', label: 'Payslips', icon: Receipt },
     { id: 'attendance', label: 'Attendance', icon: UserCheck },
   ] : [
     { id: 'dashboard', label: 'My Bio', icon: LayoutDashboard },
     { id: 'attendance', label: 'Attendance', icon: UserCheck },
     { id: 'leaves', label: 'Leaves', icon: CalendarDays },
-    { id: 'payroll', label: 'Salary Slips', icon: Receipt },
+    { id: 'payroll', label: 'Payslips', icon: Receipt },
   ];
 
   return (
@@ -48,7 +48,6 @@ export const BottomDock = ({ activeTab, setActiveTab, darkMode, setDarkMode }) =
                 {item.label}
               </span>
 
-              {/* Active Indicator Dot */}
               {isActive && (
                 <span className="absolute -bottom-1 w-1.5 h-1.5 bg-rose-400 rounded-full shadow-xs" />
               )}
@@ -58,7 +57,6 @@ export const BottomDock = ({ activeTab, setActiveTab, darkMode, setDarkMode }) =
 
         <div className={`h-6 w-[1px] mx-1 ${darkMode ? 'bg-stone-800' : 'bg-stone-200'}`} />
 
-        {/* Quick Theme Switcher in Bottom Dock */}
         <button
           onClick={() => setDarkMode(!darkMode)}
           title="Toggle Theme"

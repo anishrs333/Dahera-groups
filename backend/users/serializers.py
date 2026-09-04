@@ -20,10 +20,10 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'scheduled_login_time', 'full_name']
 
-    def get_scheduled_login_time(self, obj) -> str:
+    def get_scheduled_login_time(self, obj):
         return obj.get_scheduled_login_time()
 
-    def get_full_name(self, obj) -> str:
+    def get_full_name(self, obj):
         return obj.get_full_name() or obj.username
 
 class UserCreateUpdateSerializer(serializers.ModelSerializer):
@@ -71,11 +71,11 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         phone_number = (validated_data.get('phone') or '').strip()
         gender = validated_data.get('gender', 'MALE')
 
-        gender_prefix = 'THG-F-' if gender == 'FEMALE' else 'THG-M-'
+        prefix = 'THG-F-' if gender == 'FEMALE' else 'THG-M-'
         count = User.objects.filter(gender=gender).exclude(role='ADMIN').count() + 1
         
         while True:
-            candidate_id = f"{gender_prefix}{count:02d}"
+            candidate_id = f"{prefix}{count:02d}"
             if not User.objects.filter(employee_id=candidate_id).exists():
                 validated_data['employee_id'] = candidate_id
                 break
@@ -114,7 +114,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             if user_obj:
                 if not user_obj.is_active or user_obj.status == 'TERMINATED':
                     raise serializers.ValidationError({
-                        'detail': 'Access Denied. Your employment account with Thahira Groups has been terminated.'
+                        'detail': 'Account is terminated. Please contact admin.'
                     })
                 attrs['username'] = user_obj.username
 
@@ -122,7 +122,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         
         if not self.user.is_active or self.user.status == 'TERMINATED':
             raise serializers.ValidationError({
-                'detail': 'Access Denied. Your employment account with Thahira Groups has been terminated.'
+                'detail': 'Account is terminated. Please contact admin.'
             })
 
         data['user'] = UserSerializer(self.user).data

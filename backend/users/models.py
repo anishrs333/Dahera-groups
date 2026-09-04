@@ -24,7 +24,7 @@ class User(AbstractUser):
     department = models.CharField(max_length=100, default='Engineering', blank=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     date_of_joining = models.DateField(null=True, blank=True)
-    bio = models.TextField(blank=True, default="Dedicated team member at Thahira Groups.")
+    bio = models.TextField(blank=True, default='')
     base_salary = models.DecimalField(max_digits=12, decimal_places=2, default=50000.00)
 
     def get_scheduled_login_time(self) -> str:
@@ -42,4 +42,4 @@ class User(AbstractUser):
         return self.role == self.Role.ADMIN or self.is_superuser
 
     def __str__(self):
-        return f"{self.get_full_name() or self.username} ({self.employee_id or 'No ID'}) - {self.role}"
+        return f"{self.get_full_name() or self.username} ({self.employee_id or 'N/A'})"
