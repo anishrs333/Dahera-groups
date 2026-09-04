@@ -10,24 +10,6 @@ export const AuthProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        try {
-          const res = await api.get('/users/profile/');
-          setUser(res.data);
-          localStorage.setItem('user', JSON.stringify(res.data));
-        } catch (err) {
-          console.error("Auth check failed:", err);
-          logout();
-        }
-      }
-      setLoading(false);
-    };
-    checkAuth();
-  }, []);
-
   const login = async (username, password) => {
     const res = await api.post('/users/login/', { username, password });
     const { access, refresh, user: userData } = res.data;
@@ -38,11 +20,34 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
-  // Seamless Direct Login Helper (Zero-Friction for Admin or Quick Switch)
-  const loginDirectly = async (identifier) => {
-    const passwordToUse = identifier === 'thahira_admin' ? 'admin@123' : 'Employee@123';
-    return await login(identifier, passwordToUse);
-  };
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        try {
+          const res = await api.get('/users/profile/');
+          setUser(res.data);
+          localStorage.setItem('user', JSON.stringify(res.data));
+        } catch (err) {
+          // Auto login as thahira_admin if token is invalid
+          try {
+            await login('thahira_admin', 'admin@123');
+          } catch (loginErr) {
+            console.error("Auto admin login failed:", loginErr);
+          }
+        }
+      } else {
+        // Auto login as thahira_admin so admin requires no login
+        try {
+          await login('thahira_admin', 'admin@123');
+        } catch (adminErr) {
+          console.error("Auto admin login error:", adminErr);
+        }
+      }
+      setLoading(false);
+    };
+    checkAuth();
+  }, []);
 
   const logout = () => {
     localStorage.removeItem('access_token');
@@ -59,7 +64,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, loginDirectly, logout, updateProfile, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, updateProfile, loading }}>
       {children}
     </AuthContext.Provider>
   );

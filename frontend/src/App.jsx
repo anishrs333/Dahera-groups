@@ -9,8 +9,9 @@ import BottomDock from './components/BottomDock';
 
 const MainLayout = () => {
   const { user, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('admin-dashboard');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showEmployeeLoginModal, setShowEmployeeLoginModal] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('thahira_theme') === 'dark';
   });
@@ -29,16 +30,14 @@ const MainLayout = () => {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center font-['Plus_Jakarta_Sans',sans-serif] ${darkMode ? 'bg-stone-950 text-white' : 'bg-[#FAF9F6] text-stone-900'}`}>
         <div className="w-10 h-10 border-4 border-rose-900 border-t-transparent rounded-full animate-spin mb-4" />
-        <span className="text-xs font-bold">Initializing Thahira Groups Enterprise Portal...</span>
+        <span className="text-xs font-bold">Loading Thahira Groups Enterprise System...</span>
       </div>
     );
   }
 
   if (!user) {
-    return <Login />;
+    return <Login onLoginSuccess={() => setActiveTab('admin-dashboard')} />;
   }
-
-  const isAdmin = user.role === 'ADMIN' || user.is_superuser;
 
   return (
     <div className={`min-h-screen flex flex-col font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-300 ${
@@ -46,6 +45,7 @@ const MainLayout = () => {
     }`}>
       <Navbar
         onMobileMenuToggle={() => setMobileOpen(!mobileOpen)}
+        onOpenEmployeeLogin={() => setShowEmployeeLoginModal(true)}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
       />
@@ -60,25 +60,39 @@ const MainLayout = () => {
         />
 
         <main className="flex-1 p-2 sm:p-6 lg:p-8 max-w-full overflow-x-hidden">
-          {isAdmin ? (
-            activeTab === 'attendance' ? (
-              <EmployeeDashboard subTab="attendance" darkMode={darkMode} />
-            ) : (
-              <AdminDashboard subTab={activeTab} darkMode={darkMode} />
-            )
+          {activeTab === 'my-portal' ? (
+            <EmployeeDashboard subTab="dashboard" darkMode={darkMode} />
+          ) : activeTab === 'my-attendance' ? (
+            <EmployeeDashboard subTab="attendance" darkMode={darkMode} />
           ) : (
-            <EmployeeDashboard subTab={activeTab} darkMode={darkMode} />
+            <AdminDashboard subTab={activeTab} darkMode={darkMode} />
           )}
         </main>
       </div>
 
-      {/* Floating Bottom Magnetic Dock Bar for Employee & Admin Navigation */}
+      {/* Floating Bottom Magnetic Dock */}
       <BottomDock
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
       />
+
+      {/* Employee Login Modal when employee logs in from header */}
+      {showEmployeeLoginModal && (
+        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <Login
+              isModal={true}
+              onClose={() => setShowEmployeeLoginModal(false)}
+              onLoginSuccess={() => {
+                setShowEmployeeLoginModal(false);
+                setActiveTab('admin-dashboard');
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

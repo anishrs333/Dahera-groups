@@ -1,8 +1,8 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Building2, Clock, Menu, Shield, RefreshCw, Sun, Moon } from 'lucide-react';
+import { Building2, Clock, Menu, Shield, User, Sun, Moon, LogOut } from 'lucide-react';
 
-export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
+export const Navbar = ({ onMobileMenuToggle, onOpenEmployeeLogin, darkMode, setDarkMode }) => {
   const { user, logout } = useAuth();
 
   const isAdmin = user?.role === 'ADMIN' || user?.is_superuser;
@@ -37,7 +37,7 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
                 Thahira Groups
               </span>
               <span className="text-[9px] sm:text-[10px] text-rose-800 font-bold tracking-wider uppercase block leading-none">
-                Portal
+                Admin Dashboard System
               </span>
             </div>
           </div>
@@ -62,7 +62,7 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
                 : 'bg-rose-50 text-rose-900 border-rose-200'
             }`}>
               <Shield className="w-3.5 h-3.5 text-rose-800 shrink-0" />
-              <span className="truncate">Admin</span>
+              <span className="truncate">Admin Active (No Login Required)</span>
             </div>
           )}
 
@@ -78,13 +78,14 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
+          {/* User Profile Pill */}
           <div className={`flex items-center gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border ${
             darkMode
               ? 'bg-stone-800 border-stone-700'
               : 'bg-stone-100 border-stone-200'
           }`}>
             <div className="w-6 h-6 bg-[#881337] text-white rounded-full flex items-center justify-center text-xs font-black shadow-xs shrink-0">
-              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'T'}
+              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
             </div>
             <div className="text-left hidden md:block">
               <span className={`text-xs font-bold block leading-tight truncate max-w-[120px] ${darkMode ? 'text-white' : 'text-stone-900'}`}>
@@ -96,17 +97,24 @@ export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
             </div>
           </div>
 
-          <button
-            onClick={logout}
-            title="Logout"
-            className={`p-1.5 sm:p-2 rounded-full border transition-all duration-200 active:scale-95 ${
-              darkMode
-                ? 'text-stone-400 border-stone-800 hover:text-rose-400 hover:bg-rose-950/40'
-                : 'text-stone-400 border-stone-200 hover:text-rose-900 hover:bg-rose-50'
-            }`}
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
+          {/* Employee Sign In Action Button (Admin requires no logout) */}
+          {isAdmin ? (
+            <button
+              onClick={onOpenEmployeeLogin}
+              className="px-3 py-1.5 bg-[#881337] hover:bg-[#991B1B] text-white font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Employee Sign In</span>
+            </button>
+          ) : (
+            <button
+              onClick={logout}
+              title="Logout Employee"
+              className="p-1.5 sm:p-2 rounded-full border border-stone-200 text-stone-500 hover:text-rose-900 hover:bg-rose-50 transition-all"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          )}
 
         </div>
 

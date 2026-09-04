@@ -6,19 +6,12 @@ export const BottomDock = ({ activeTab, setActiveTab, darkMode, setDarkMode }) =
   const { user } = useAuth();
   if (!user) return null;
 
-  const isAdmin = user?.role === 'ADMIN' || user?.is_superuser;
-
-  const dockItems = isAdmin ? [
-    { id: 'admin-dashboard', label: 'Overview', icon: LayoutDashboard },
+  const dockItems = [
+    { id: 'admin-dashboard', label: 'Admin', icon: LayoutDashboard },
     { id: 'admin-employees', label: 'Directory', icon: Users },
     { id: 'admin-leaves', label: 'Leaves', icon: CalendarDays },
     { id: 'admin-payroll', label: 'Payslips', icon: Receipt },
-    { id: 'attendance', label: 'Attendance', icon: UserCheck },
-  ] : [
-    { id: 'dashboard', label: 'My Bio', icon: LayoutDashboard },
-    { id: 'attendance', label: 'Attendance', icon: UserCheck },
-    { id: 'leaves', label: 'Leaves', icon: CalendarDays },
-    { id: 'payroll', label: 'Payslips', icon: Receipt },
+    { id: 'my-attendance', label: 'Attendance', icon: UserCheck },
   ];
 
   return (

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Building2, Lock, User, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Building2, Lock, User, ShieldCheck, AlertCircle, X } from 'lucide-react';
 
-export const Login = () => {
+export const Login = ({ isModal = false, onClose, onLoginSuccess }) => {
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -15,12 +15,76 @@ export const Login = () => {
     setLoading(true);
     try {
       await login(username, password);
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Invalid credentials. Please check your login info.');
+      setError(err.response?.data?.detail || 'Invalid credentials. Please check your Employee ID and Mobile Number password.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (isModal) {
+    return (
+      <div className="space-y-4 font-['Plus_Jakarta_Sans',sans-serif]">
+        <div className="flex items-center justify-between border-b pb-3 border-stone-100">
+          <div>
+            <h3 className="text-lg font-black text-stone-900">Employee Portal Sign In</h3>
+            <p className="text-xs text-stone-500">Sign in to access Admin Dashboard.</p>
+          </div>
+          {onClose && (
+            <button onClick={onClose} className="p-1 text-stone-400 hover:text-stone-700 rounded-lg">
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+
+        {error && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-rose-800 text-xs font-medium">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-700" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+          <div>
+            <label className="block font-bold text-stone-800 mb-1">
+              Employee ID or Email
+            </label>
+            <input
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="e.g. THG-M-01 or THG-F-01"
+              className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:border-[#881337] font-mono"
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold text-stone-800 mb-1">Password (Mobile Number)</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              className="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:border-[#881337]"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-3 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+          >
+            {loading ? 'Signing in...' : 'Sign In to Admin Dashboard'}
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center p-4 relative font-['Plus_Jakarta_Sans',sans-serif]">
@@ -38,23 +102,23 @@ export const Login = () => {
               </div>
             </div>
 
-            <h2 className="text-xl font-bold mb-3">Portal Login</h2>
+            <h2 className="text-xl font-bold mb-3">Employee Sign In</h2>
             <p className="text-rose-100 text-xs leading-relaxed">
-              Sign in with your assigned Employee ID or registered Email address to manage attendance, leaves, and payslips.
+              Sign in with your assigned Employee ID and Mobile Number password to access the Admin Dashboard.
             </p>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-rose-200/80 pt-6 border-t border-white/10 mt-8">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Thahira Groups • Secured Portal</span>
+            <span>Thahira Groups • Enterprise Admin System</span>
           </div>
         </div>
 
         <div className="p-8 md:p-10 flex flex-col justify-between bg-white">
           <div>
             <div className="mb-6">
-              <h3 className="text-xl font-black text-stone-900">Sign In</h3>
-              <p className="text-xs text-stone-500 mt-1">Enter your credentials to continue.</p>
+              <h3 className="text-xl font-black text-stone-900">Sign In to Admin Dashboard</h3>
+              <p className="text-xs text-stone-500 mt-1">Enter your Employee ID or Email below.</p>
             </div>
 
             {error && (
@@ -102,14 +166,14 @@ export const Login = () => {
                 disabled={loading}
                 className="w-full bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-rose-950/20 flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
               >
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? 'Signing in...' : 'Sign In to Admin Dashboard'}
               </button>
             </form>
           </div>
 
           <div className="mt-8 pt-4 border-t border-stone-100 text-center">
             <span className="text-[11px] text-stone-400">
-              Internal Portal • Authorized Access Only
+              Thahira Groups Security • Authorized Access Only
             </span>
           </div>
         </div>
