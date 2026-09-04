@@ -18,14 +18,13 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
 
     styles = getSampleStyleSheet()
     
-    # Custom styles with Rich Dark Red accents (#881337)
     title_style = ParagraphStyle(
         'CompanyHeader',
         parent=styles['Heading1'],
         fontName='Helvetica-Bold',
         fontSize=22,
         leading=26,
-        textColor=colors.HexColor('#881337'), # Rich Dark Red
+        textColor=colors.HexColor('#881337'),
         alignment=1
     )
     subtitle_style = ParagraphStyle(
@@ -64,9 +63,8 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
 
     elements = []
 
-    # Company Banner
     elements.append(Paragraph("THAHIRA GROUPS ENTERPRISE", title_style))
-    elements.append(Paragraph("Official Employee Payslip & Calendar Attendance Breakdown", subtitle_style))
+    elements.append(Paragraph("Official Employee Payslip & Calendar Breakdown", subtitle_style))
     elements.append(Spacer(1, 10))
     elements.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#881337'), spaceAfter=15))
 
@@ -74,7 +72,6 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     month_name = salary_slip.get_month_name()
     login_time = emp.get_scheduled_login_time()
 
-    # Employee Bio Meta Table
     meta_data = [
         [
             Paragraph("<b>Employee Name:</b>", cell_bold), Paragraph(emp.get_full_name() or emp.username, cell_normal),
@@ -105,7 +102,6 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     elements.append(meta_table)
     elements.append(Spacer(1, 15))
 
-    # Calendar & Daily Rate Calculation Box
     elements.append(Paragraph("Month Calendar & Daily Rate Calculation", section_style))
     elements.append(Spacer(1, 6))
 
@@ -130,7 +126,6 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     elements.append(calendar_table)
     elements.append(Spacer(1, 15))
 
-    # Detailed Financial Breakdown
     elements.append(Paragraph("Earnings Components & Deductions Summary", section_style))
     elements.append(Spacer(1, 6))
 
@@ -157,7 +152,6 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     elements.append(breakdown_table)
     elements.append(Spacer(1, 15))
 
-    # Net Salary Summary Box
     net_data = [
         [
             Paragraph("<b>NET TAKE-HOME SALARY:</b>", ParagraphStyle('NetLbl', parent=styles['Heading2'], fontSize=12, textColor=colors.HexColor('#881337'))),
@@ -174,7 +168,6 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     elements.append(net_table)
     elements.append(Spacer(1, 30))
 
-    # Signatures
     sig_data = [
         [Paragraph("__________________________<br/><b>Employee Signature</b>", cell_normal), Paragraph("__________________________<br/><b>Authorized Signatory (Thahira HR)</b>", cell_normal)]
     ]

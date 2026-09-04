@@ -4,7 +4,7 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dahera-groups-enterprise-secure-key-2026-super-secret')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'thahira-groups-secret-key-2026')
 
 DEBUG = True
 
@@ -18,12 +18,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # Third party apps
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
     
-    # Local apps
     'users',
     'attendance',
     'leaves',
@@ -78,7 +76,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
@@ -118,4 +116,3 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_EXPOSE_HEADERS = ['Content-Disposition']
-
