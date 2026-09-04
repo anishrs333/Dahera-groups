@@ -107,11 +107,11 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     cal_data = [
         [
             Paragraph("<b>Month Calendar Days:</b>", cell_bold), Paragraph(f"{salary_slip.days_in_month} Days", cell_normal),
-            Paragraph("<b>Per-Day Salary Rate:</b>", cell_bold), Paragraph(f"<b>${salary_slip.daily_rate:,.2f} / day</b>", cell_normal)
+            Paragraph("<b>Per-Day Salary Rate:</b>", cell_bold), Paragraph(f"<b>₹{salary_slip.daily_rate:,.2f} / day</b>", cell_normal)
         ],
         [
             Paragraph("<b>Unpaid Leave Days:</b>", cell_bold), Paragraph(f"{salary_slip.leave_days_deducted} Days", cell_normal),
-            Paragraph("<b>Leave Deduction Amount:</b>", cell_bold), Paragraph(f"<font color='#991B1B'><b>-${salary_slip.leave_deduction_amount:,.2f}</b></font>", cell_normal)
+            Paragraph("<b>Leave Deduction Amount:</b>", cell_bold), Paragraph(f"<font color='#991B1B'><b>-₹{salary_slip.leave_deduction_amount:,.2f}</b></font>", cell_normal)
         ]
     ]
     cal_table = Table(cal_data, colWidths=[130, 140, 130, 140])
@@ -129,16 +129,16 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     
     table_data = [
         [
-            Paragraph("<b>Earnings Description</b>", cell_bold), Paragraph("<b>Amount ($)</b>", cell_bold),
-            Paragraph("<b>Deductions Description</b>", cell_bold), Paragraph("<b>Amount ($)</b>", cell_bold)
+            Paragraph("<b>Earnings Description</b>", cell_bold), Paragraph("<b>Amount (₹)</b>", cell_bold),
+            Paragraph("<b>Deductions Description</b>", cell_bold), Paragraph("<b>Amount (₹)</b>", cell_bold)
         ],
-        [Paragraph("Base Monthly Basic Salary", cell_normal), Paragraph(f"${salary_slip.basic_salary:,.2f}", cell_normal), Paragraph("Leave Absence Deduction", cell_normal), Paragraph(f"-${salary_slip.leave_deduction_amount:,.2f}", cell_normal)],
-        [Paragraph("HRA & Allowances", cell_normal), Paragraph(f"${salary_slip.allowances:,.2f}", cell_normal), Paragraph("PF / Tax Deductions", cell_normal), Paragraph(f"-${salary_slip.deductions:,.2f}", cell_normal)],
+        [Paragraph("Base Monthly Basic Salary", cell_normal), Paragraph(f"₹{salary_slip.basic_salary:,.2f}", cell_normal), Paragraph("Leave Absence Deduction", cell_normal), Paragraph(f"-₹{salary_slip.leave_deduction_amount:,.2f}", cell_normal)],
+        [Paragraph("HRA & Allowances", cell_normal), Paragraph(f"₹{salary_slip.allowances:,.2f}", cell_normal), Paragraph("PF / Tax Deductions", cell_normal), Paragraph(f"-₹{salary_slip.deductions:,.2f}", cell_normal)],
         [
             Paragraph("<b>Total Gross Earnings</b>", cell_bold),
-            Paragraph(f"<b>${(salary_slip.basic_salary + salary_slip.allowances):,.2f}</b>", cell_bold),
+            Paragraph(f"<b>₹{(salary_slip.basic_salary + salary_slip.allowances):,.2f}</b>", cell_bold),
             Paragraph("<b>Total Deductions</b>", cell_bold),
-            Paragraph(f"<b>${(salary_slip.leave_deduction_amount + salary_slip.deductions):,.2f}</b>", cell_bold)
+            Paragraph(f"<b>₹{(salary_slip.leave_deduction_amount + salary_slip.deductions):,.2f}</b>", cell_bold)
         ]
     ]
 
@@ -157,7 +157,7 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     net_pay_data = [
         [
             Paragraph("<b>NET TAKE-HOME SALARY PAYABLE:</b>", ParagraphStyle('NetLbl', parent=styles['Heading2'], fontSize=12, textColor=colors.HexColor('#881337'))),
-            Paragraph(f"<b>${salary_slip.net_salary:,.2f}</b>", ParagraphStyle('NetVal', parent=styles['Heading1'], fontSize=16, textColor=colors.HexColor('#15803D'), alignment=2))
+            Paragraph(f"<b>₹{salary_slip.net_salary:,.2f}</b>", ParagraphStyle('NetVal', parent=styles['Heading1'], fontSize=16, textColor=colors.HexColor('#15803D'), alignment=2))
         ]
     ]
     net_table = Table(net_pay_data, colWidths=[300, 240])

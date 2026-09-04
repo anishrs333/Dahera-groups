@@ -563,26 +563,26 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                     </div>
                     <div className="flex justify-between items-center text-[11px]">
                       <span className="text-stone-600 font-medium">Daily Salary Rate:</span>
-                      <strong className="text-stone-900">${parseFloat(slip.daily_rate || 0).toLocaleString('en-US')}/day</strong>
+                      <strong className="text-stone-900">₹{parseFloat(slip.daily_rate || 0).toLocaleString('en-IN')}/day</strong>
                     </div>
                     <div className="flex justify-between items-center text-[11px]">
                       <span className="text-rose-900 font-bold">Leave Days Deducted ({slip.leave_days_deducted || 0} days):</span>
-                      <strong className="text-rose-900 font-black">-${parseFloat(slip.leave_deduction_amount || 0).toLocaleString('en-US')}</strong>
+                      <strong className="text-rose-900 font-black">-₹{parseFloat(slip.leave_deduction_amount || 0).toLocaleString('en-IN')}</strong>
                     </div>
                   </div>
 
                   <div className={`grid grid-cols-3 gap-2 p-3 rounded-xl border text-xs ${cardBg}`}>
                     <div>
                       <span className={`block text-[10px] ${textMuted}`}>BASE SALARY</span>
-                      <span className="font-semibold">${parseFloat(slip.basic_salary).toLocaleString('en-US')}</span>
+                      <span className="font-semibold">₹{parseFloat(slip.basic_salary).toLocaleString('en-IN')}</span>
                     </div>
                     <div>
                       <span className={`block text-[10px] ${textMuted}`}>ALLOWANCES</span>
-                      <span className="font-semibold">${parseFloat(slip.allowances).toLocaleString('en-US')}</span>
+                      <span className="font-semibold">₹{parseFloat(slip.allowances).toLocaleString('en-IN')}</span>
                     </div>
                     <div>
                       <span className={`block text-[10px] ${textMuted}`}>NET PAYABLE</span>
-                      <span className="font-bold text-emerald-700">${parseFloat(slip.net_salary).toLocaleString('en-US')}</span>
+                      <span className="font-bold text-emerald-700">₹{parseFloat(slip.net_salary).toLocaleString('en-IN')}</span>
                     </div>
                   </div>
 

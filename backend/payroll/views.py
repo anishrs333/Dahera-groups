@@ -60,7 +60,7 @@ class SalarySlipViewSet(viewsets.ModelViewSet):
             Notification.objects.create(
                 recipient=emp,
                 title="Salary Slip Issued",
-                message=f"Your salary slip for {slip.get_month_name()} {slip.year} has been issued. Net take-home: ${slip.net_salary:,.2f}.",
+                message=f"Your salary slip for {slip.get_month_name()} {slip.year} has been issued. Net take-home: ₹{slip.net_salary:,.2f}.",
                 target="EMPLOYEE",
                 link_tab="payroll",
                 created_by=request.user

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Users, CalendarDays, Receipt, UserPlus, CheckCircle, XCircle, Clock, Search, ShieldCheck, DollarSign, Download, UserX, UserCheck, Calculator, Filter, FileText } from 'lucide-react';
+import { Users, CalendarDays, Receipt, UserPlus, CheckCircle, XCircle, Clock, Search, ShieldCheck, IndianRupee, Download, UserX, UserCheck, Calculator, Filter, FileText } from 'lucide-react';
 
 export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false }) => {
   const [employees, setEmployees] = useState([]);
@@ -442,11 +442,11 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
           <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
             <div>
               <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Monthly Payroll</span>
-              <span className="text-2xl font-black text-emerald-600">${totalPayroll.toLocaleString('en-US')}</span>
+              <span className="text-2xl font-black text-emerald-600">₹{totalPayroll.toLocaleString('en-IN')}</span>
               <span className={`text-xs block mt-1 ${textMuted}`}>Issued total</span>
             </div>
             <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl">
-              <DollarSign className="w-6 h-6" />
+              <IndianRupee className="w-6 h-6" />
             </div>
           </div>
         </div>
@@ -845,13 +845,13 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                       <span className="block text-[10px] text-stone-500">{slip.days_in_month || 30} Days</span>
                     </td>
                     <td className="py-3.5 px-4 font-mono font-bold text-stone-700">
-                      ${parseFloat(slip.daily_rate || 0).toLocaleString('en-US')}/day
+                      ₹{parseFloat(slip.daily_rate || 0).toLocaleString('en-IN')}/day
                     </td>
                     <td className="py-3.5 px-4 font-mono font-bold text-rose-800">
-                      -${parseFloat(slip.leave_deduction_amount || 0).toLocaleString('en-US')}
+                      -₹{parseFloat(slip.leave_deduction_amount || 0).toLocaleString('en-IN')}
                       <span className="block text-[10px] font-sans font-normal text-stone-500">({slip.leave_days_deducted || 0} day leave)</span>
                     </td>
-                    <td className="py-3.5 px-4 font-black text-emerald-600">${parseFloat(slip.net_salary).toLocaleString('en-US')}</td>
+                    <td className="py-3.5 px-4 font-black text-emerald-600">₹{parseFloat(slip.net_salary).toLocaleString('en-IN')}</td>
                     <td className="py-3.5 px-4">
                       <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold rounded-full">
                         {slip.status}
@@ -992,7 +992,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   />
                 </div>
                 <div>
-                  <label className="block text-stone-700 font-bold mb-1">Monthly Salary ($)</label>
+                  <label className="block text-stone-700 font-bold mb-1">Monthly Salary (INR)</label>
                   <input
                     type="number"
                     required
@@ -1100,7 +1100,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-stone-700 font-bold mb-1">Basic Salary ($)</label>
+                  <label className="block text-stone-700 font-bold mb-1">Basic Salary (INR)</label>
                   <input
                     type="number"
                     required
@@ -1130,21 +1130,21 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                 </div>
                 <div className="flex justify-between text-stone-700">
                   <span>Month Days: <strong>{calcDaysInMonth} Days</strong></span>
-                  <span>Daily Rate: <strong>${calcDailyRate.toFixed(2)}/day</strong></span>
+                  <span>Daily Rate: <strong>₹{calcDailyRate.toFixed(2)}/day</strong></span>
                 </div>
                 <div className="flex justify-between text-stone-700">
                   <span>Leave Deduction ({calcLeaveDays} day leave):</span>
-                  <strong className="text-rose-900">-${calcLeaveDeduction.toFixed(2)}</strong>
+                  <strong className="text-rose-900">-₹{calcLeaveDeduction.toFixed(2)}</strong>
                 </div>
                 <div className="flex justify-between text-stone-900 border-t border-rose-200 pt-1 font-bold">
                   <span>Net Salary:</span>
-                  <span className="text-emerald-700 text-sm font-black">${calcNetSalary.toFixed(2)}</span>
+                  <span className="text-emerald-700 text-sm font-black">₹{calcNetSalary.toFixed(2)}</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-stone-700 font-bold mb-1">Allowances ($)</label>
+                  <label className="block text-stone-700 font-bold mb-1">Allowances (INR)</label>
                   <input
                     type="number"
                     placeholder="Enter allowances"
@@ -1154,7 +1154,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   />
                 </div>
                 <div>
-                  <label className="block text-stone-700 font-bold mb-1">Deductions ($)</label>
+                  <label className="block text-stone-700 font-bold mb-1">Deductions (INR)</label>
                   <input
                     type="number"
                     placeholder="Enter deductions"
