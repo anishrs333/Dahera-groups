@@ -12,6 +12,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
   // Modal state for adding employee
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addMsg, setAddMsg] = useState('');
   const [newEmp, setNewEmp] = useState({
     username: '',
     email: '',
@@ -20,13 +21,32 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
     password: 'Employee@123',
     gender: 'MALE',
     role: 'EMPLOYEE',
-    employee_id: '',
+    employee_id: 'DEG-103',
     designation: 'Software Engineer',
     department: 'Engineering',
     base_salary: '60000',
-    bio: ''
+    bio: 'Dedicated team member at Dahera Groups.'
   });
-  const [addMsg, setAddMsg] = useState('');
+
+  const handleOpenAddModal = () => {
+    const randomId = `DEG-${Math.floor(100 + Math.random() * 900)}`;
+    setNewEmp({
+      username: '',
+      email: '',
+      first_name: '',
+      last_name: '',
+      password: 'Employee@123',
+      gender: 'MALE',
+      role: 'EMPLOYEE',
+      employee_id: randomId,
+      designation: 'Software Engineer',
+      department: 'Engineering',
+      base_salary: '60000',
+      bio: 'Dedicated team member at Dahera Groups.'
+    });
+    setAddMsg('');
+    setShowAddModal(true);
+  };
 
   // Modal state for generating salary slip
   const [showSlipModal, setShowSlipModal] = useState(false);
@@ -169,7 +189,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
         
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={handleOpenAddModal}
             className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-emerald-600/30 flex items-center gap-2"
           >
             <UserPlus className="w-4 h-4" />
