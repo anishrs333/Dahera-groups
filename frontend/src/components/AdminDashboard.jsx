@@ -72,6 +72,15 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
     deductions: '1000'
   });
 
+  const getDaysInMonth = (month, year) => {
+    const m = parseInt(month, 10);
+    const y = parseInt(year, 10);
+    if (m && y) {
+      return new Date(y, m, 0).getDate();
+    }
+    return 30;
+  };
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -327,7 +336,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
   );
 
   const calcBase = parseFloat(slipForm.basic_salary || 0);
-  const calcDaysInMonth = 30;
+  const calcDaysInMonth = getDaysInMonth(slipForm.month, slipForm.year);
   const calcDailyRate = calcBase > 0 ? (calcBase / calcDaysInMonth) : 0;
   const calcLeaveDays = parseFloat(slipForm.leave_days_deducted || 0);
   const calcLeaveDeduction = calcLeaveDays * calcDailyRate;
@@ -432,7 +441,6 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
         </div>
       )}
 
-      {/* Attendance Monitoring Section (Shown on admin-dashboard and admin-attendance) */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-attendance') && (
         <div className="space-y-6">
           <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
@@ -598,7 +606,6 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
         </div>
       )}
 
-      {/* Leave Requests Queue Section */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-leaves') && (
         <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
           <div className="flex items-center justify-between border-b border-stone-100 pb-4">
@@ -681,7 +688,6 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
         </div>
       )}
 
-      {/* Employee Directory Section */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-employees') && (
         <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
@@ -773,7 +779,6 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
         </div>
       )}
 
-      {/* Salary Slips Section */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-payroll') && (
         <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
           <div className="flex items-center justify-between border-b border-stone-100 pb-4">
@@ -1014,18 +1019,18 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                     onChange={(e) => setSlipForm({...slipForm, month: e.target.value})}
                     className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                   >
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
+                    <option value="1">January (31 Days)</option>
+                    <option value="2">February (28/29 Days)</option>
+                    <option value="3">March (31 Days)</option>
+                    <option value="4">April (30 Days)</option>
+                    <option value="5">May (31 Days)</option>
+                    <option value="6">June (30 Days)</option>
+                    <option value="7">July (31 Days)</option>
+                    <option value="8">August (31 Days)</option>
+                    <option value="9">September (30 Days)</option>
+                    <option value="10">October (31 Days)</option>
+                    <option value="11">November (30 Days)</option>
+                    <option value="12">December (31 Days)</option>
                   </select>
                 </div>
                 <div>
@@ -1066,10 +1071,10 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
               <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs space-y-1.5">
                 <div className="flex items-center gap-1.5 text-rose-900 font-bold text-[11px] mb-1">
                   <Calculator className="w-4 h-4 text-rose-800" />
-                  <span>Calculation Preview</span>
+                  <span>Calendar Calculation Preview</span>
                 </div>
                 <div className="flex justify-between text-stone-700">
-                  <span>Month Days: <strong>30 Days</strong></span>
+                  <span>Month Days: <strong>{calcDaysInMonth} Days</strong></span>
                   <span>Daily Rate: <strong>₹{calcDailyRate.toFixed(2)}/day</strong></span>
                 </div>
                 <div className="flex justify-between text-stone-700">
