@@ -37,16 +37,16 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        # Initial password requirement: Initial password is the employee's Mobile Number (phone)
         provided_password = validated_data.pop('password', None)
         phone_number = validated_data.get('phone', '').strip()
         
+        # Initial Password = Employee Mobile Number
         initial_password = provided_password or phone_number or '9876543210'
 
-        # Auto-generate employee_id if missing
+        # Auto-generate employee_id if missing: THG-M-01 or THG-F-01
         if not validated_data.get('employee_id'):
-            gender_prefix = 'DHG-F-' if validated_data.get('gender') == 'FEMALE' else 'DHG-M-'
-            count = User.objects.filter(role='EMPLOYEE').count() + 1
+            gender_prefix = 'THG-F-' if validated_data.get('gender') == 'FEMALE' else 'THG-M-'
+            count = User.objects.filter(role='EMPLOYEE', gender=validated_data.get('gender')).count() + 1
             formatted_num = count if count >= 10 else f"0{count}"
             validated_data['employee_id'] = f"{gender_prefix}{formatted_num}"
 
@@ -66,8 +66,8 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
-    JWT Serializer: Authenticate via Email, Username, or Employee ID.
-    Initial password for employees is their registered Mobile Number.
+    JWT Serializer for Thahira Groups:
+    Authenticate via Email, Username, or Employee ID (THG-M-01 / THG-F-01).
     """
     def validate(self, attrs):
         login_input = attrs.get('username', '').strip()

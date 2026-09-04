@@ -29,13 +29,13 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
   };
 
   const navContent = (
-    <div className="flex flex-col h-full justify-between py-5 bg-white border-r border-slate-200">
+    <div className="flex flex-col h-full justify-between py-5 bg-white border-r border-stone-200">
       <div>
         <div className="px-5 mb-5 flex items-center justify-between">
-          <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
+          <span className="text-[11px] font-extrabold text-rose-900 uppercase tracking-wider flex items-center gap-1.5">
             {isAdmin ? (
               <>
-                <Shield className="w-3.5 h-3.5 text-blue-600" />
+                <Shield className="w-3.5 h-3.5 text-rose-900" />
                 <span>Admin Command Center</span>
               </>
             ) : (
@@ -44,7 +44,7 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
           </span>
           <button
             onClick={() => setMobileOpen(false)}
-            className="md:hidden text-slate-400 hover:text-slate-600"
+            className="md:hidden text-stone-400 hover:text-stone-700"
           >
             <X className="w-5 h-5" />
           </button>
@@ -60,11 +60,11 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
                 onClick={() => handleSelect(item.id)}
                 className={`w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-bold transition-all ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-[#881337] text-white shadow-md shadow-rose-950/20'
+                    : 'text-stone-600 hover:bg-stone-100/80 hover:text-stone-900'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-stone-400'}`} />
                 <span>{item.label}</span>
               </button>
             );
@@ -72,8 +72,8 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
         </nav>
       </div>
 
-      <div className="px-5 pt-4 border-t border-slate-100 text-xs text-slate-400">
-        <p className="font-bold text-slate-700">Dahera Groups ERP v1.0</p>
+      <div className="px-5 pt-4 border-t border-stone-100 text-xs text-stone-400">
+        <p className="font-bold text-stone-800">Thahira Groups ERP v1.0</p>
         <p className="text-[11px]">User-Friendly Enterprise Suite</p>
       </div>
     </div>
@@ -90,7 +90,7 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 md:hidden"
+          className="fixed inset-0 bg-stone-950/50 backdrop-blur-xs z-40 md:hidden"
         />
       )}
 

@@ -5,7 +5,7 @@ from .models import User
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = BaseUserAdmin.fieldsets + (
-        ('Dahera Organization Info', {
+        ('Thahira Organization Info', {
             'fields': ('gender', 'role', 'employee_id', 'designation', 'department', 'phone', 'date_of_joining', 'bio', 'base_salary')
         }),
     )

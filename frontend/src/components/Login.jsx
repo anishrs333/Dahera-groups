@@ -17,7 +17,7 @@ export const Login = () => {
       await login(username, password);
     } catch (err) {
       setError(err.response?.data?.detail || 'Invalid login credentials. Please check your Employee ID / Email and Password (Initial Password is your Mobile Number).');
-    } finally {
+    } fiudnally: {
       setLoading(false);
     }
   };
@@ -35,34 +35,34 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 relative font-['Inter',sans-serif]">
-      <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center p-4 relative font-['Plus_Jakarta_Sans',sans-serif]">
+      <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 bg-white border border-stone-200 rounded-3xl shadow-2xl overflow-hidden">
         
-        {/* Left Side: Brand Overview & Password Guidance */}
-        <div className="p-8 md:p-10 bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 text-white flex flex-col justify-between">
+        {/* Left Side: Brand Overview & Instant Admin Access */}
+        <div className="p-8 md:p-10 bg-gradient-to-br from-[#4C0519] via-[#881337] to-[#991B1B] text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3.5 mb-8">
-              <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-600/30">
+              <div className="p-3 bg-white/10 backdrop-blur rounded-2xl text-white shadow-lg border border-white/20">
                 <Building2 className="w-8 h-8" />
               </div>
               <div>
-                <h1 className="text-2xl font-extrabold tracking-tight">Dahera Groups</h1>
-                <span className="text-[11px] font-semibold text-blue-400 tracking-wider uppercase">Enterprise ERP Portal</span>
+                <h1 className="text-2xl font-black tracking-tight">Thahira Groups</h1>
+                <span className="text-[11px] font-semibold text-rose-200 tracking-wider uppercase">Enterprise ERP Portal</span>
               </div>
             </div>
 
             <h2 className="text-xl font-bold mb-3">Employee & Admin Portal</h2>
-            <p className="text-slate-300 text-xs leading-relaxed mb-6">
-              Log in with your assigned <strong>Employee ID</strong> or Email.
+            <p className="text-rose-100 text-xs leading-relaxed mb-6">
+              Sign in with your assigned <strong>Employee ID</strong> (e.g. <code className="bg-rose-950/60 px-1.5 py-0.5 rounded text-white">THG-M-01</code> / <code className="bg-rose-950/60 px-1.5 py-0.5 rounded text-white">THG-F-01</code>) or Email address.
             </p>
 
-            {/* Beginner-Friendly Initial Password Callout */}
-            <div className="bg-white/10 backdrop-blur border border-white/20 p-4 rounded-2xl mb-4 space-y-2">
-              <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-                <Phone className="w-4 h-4" />
+            {/* Initial Password Note */}
+            <div className="bg-black/20 backdrop-blur border border-white/20 p-4 rounded-2xl mb-4 space-y-2">
+              <div className="flex items-center gap-2 text-rose-200 font-bold text-xs">
+                <Phone className="w-4 h-4 text-emerald-400" />
                 <span>Initial Password = Mobile Number</span>
               </div>
-              <p className="text-[11px] text-slate-300">
+              <p className="text-[11px] text-rose-100">
                 When Admin creates your employee profile (Male or Female), your <strong>initial password is set to your Mobile Number</strong>.
               </p>
             </div>
@@ -73,7 +73,7 @@ export const Login = () => {
                 type="button"
                 onClick={handleAdminDirectLogin}
                 disabled={loading}
-                className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2"
+                className="w-full bg-white hover:bg-rose-50 text-[#881337] font-black py-3 px-4 rounded-xl text-xs transition-all shadow-xl flex items-center justify-center gap-2"
               >
                 <Shield className="w-4 h-4" />
                 <span>Enter Admin Dashboard Directly</span>
@@ -82,59 +82,59 @@ export const Login = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-400 pt-6 border-t border-white/10">
+          <div className="flex items-center gap-2 text-xs text-rose-200/80 pt-6 border-t border-white/10">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Dahera Groups ERP System • Secured & Verified</span>
+            <span>Thahira Groups ERP System • Secured & Verified</span>
           </div>
         </div>
 
-        {/* Right Side: Clean Employee Sign In Form (Dummy Buttons Removed) */}
+        {/* Right Side: Clean Sign In Form */}
         <div className="p-8 md:p-10 flex flex-col justify-between bg-white">
           <div>
             <div className="mb-6">
-              <h3 className="text-xl font-extrabold text-slate-900">Sign In to Portal</h3>
-              <p className="text-xs text-slate-500 mt-1">Enter your Employee ID or Email address below.</p>
+              <h3 className="text-xl font-black text-stone-900">Sign In to Portal</h3>
+              <p className="text-xs text-stone-500 mt-1">Enter your Employee ID or Email address below.</p>
             </div>
 
             {error && (
-              <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2.5 text-rose-700 text-xs font-medium">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2.5 text-rose-800 text-xs font-medium">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-700" />
                 <span>{error}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-stone-800 mb-1">
                   Employee ID or Email Address
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="e.g. DHG-M-01 or employee@dahera.com"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-600 font-mono"
+                    placeholder="e.g. THG-M-01 or thahira_admin"
+                    className="w-full bg-stone-50 border border-stone-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:border-[#881337] font-mono"
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-bold text-slate-700">Password</label>
-                  <span className="text-[10px] text-emerald-600 font-semibold">(Default: Mobile Number)</span>
+                  <label className="block text-xs font-bold text-stone-800">Password</label>
+                  <span className="text-[10px] text-rose-900 font-semibold">(Default: Mobile Number)</span>
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your registered Mobile Number"
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-600"
+                    className="w-full bg-stone-50 border border-stone-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:border-[#881337]"
                   />
                 </div>
               </div>
@@ -142,16 +142,16 @@ export const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+                className="w-full bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-rose-950/20 flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
               >
                 {loading ? 'Signing in...' : 'Sign In to Portal'}
               </button>
             </form>
           </div>
 
-          <div className="mt-8 pt-4 border-t border-slate-100 text-center">
-            <span className="text-[11px] text-slate-400">
-              New employees are created by the HR Administrator with their mobile number as the initial password.
+          <div className="mt-8 pt-4 border-t border-stone-100 text-center">
+            <span className="text-[11px] text-stone-400">
+              Admin username: <strong className="text-stone-800">thahira_admin</strong> • Employee Initial Password: <strong>Mobile Number</strong>
             </span>
           </div>
         </div>

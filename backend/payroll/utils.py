@@ -3,6 +3,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
+from decimal import Decimal
 
 def generate_salary_slip_pdf(salary_slip) -> bytes:
     buffer = io.BytesIO()
@@ -17,14 +18,14 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
 
     styles = getSampleStyleSheet()
     
-    # Custom styles
+    # Custom styles with Rich Dark Red accents (#881337)
     title_style = ParagraphStyle(
         'CompanyHeader',
         parent=styles['Heading1'],
         fontName='Helvetica-Bold',
         fontSize=22,
         leading=26,
-        textColor=colors.HexColor('#1E293B'),
+        textColor=colors.HexColor('#881337'), # Rich Dark Red
         alignment=1
     )
     subtitle_style = ParagraphStyle(
@@ -33,7 +34,7 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
         fontName='Helvetica',
         fontSize=10,
         leading=14,
-        textColor=colors.HexColor('#64748B'),
+        textColor=colors.HexColor('#52525B'),
         alignment=1
     )
     section_style = ParagraphStyle(
@@ -42,7 +43,7 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
         fontName='Helvetica-Bold',
         fontSize=13,
         leading=16,
-        textColor=colors.HexColor('#0F172A')
+        textColor=colors.HexColor('#1C1917')
     )
     cell_bold = ParagraphStyle(
         'CellBold',
@@ -50,7 +51,7 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
         fontName='Helvetica-Bold',
         fontSize=9,
         leading=12,
-        textColor=colors.HexColor('#1E293B')
+        textColor=colors.HexColor('#1C1917')
     )
     cell_normal = ParagraphStyle(
         'CellNormal',
@@ -58,16 +59,16 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
         fontName='Helvetica',
         fontSize=9,
         leading=12,
-        textColor=colors.HexColor('#334155')
+        textColor=colors.HexColor('#44403C')
     )
 
     elements = []
 
     # Company Banner
-    elements.append(Paragraph("DAHERA GROUPS ENTERPRISE", title_style))
+    elements.append(Paragraph("THAHIRA GROUPS ENTERPRISE", title_style))
     elements.append(Paragraph("Official Employee Payslip & Earnings Statement", subtitle_style))
     elements.append(Spacer(1, 10))
-    elements.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#2563EB'), spaceAfter=15))
+    elements.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#881337'), spaceAfter=15))
 
     emp = salary_slip.employee
     month_name = salary_slip.get_month_name()
@@ -95,9 +96,9 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
 
     meta_table = Table(meta_data, colWidths=[130, 140, 130, 140])
     meta_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#F8FAFC')),
-        ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#E2E8F0')),
-        ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor('#F1F5F9')),
+        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#FAF9F6')),
+        ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#E7E5E4')),
+        ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor('#F5F5F4')),
         ('TOPPADDING', (0,0), (-1,-1), 6),
         ('BOTTOMPADDING', (0,0), (-1,-1), 6),
     ]))
@@ -109,18 +110,18 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     elements.append(Spacer(1, 8))
 
     breakdown_data = [
-        [Paragraph("<b>Earnings / Pay Description</b>", cell_bold), Paragraph("<b>Amount (INR)</b>", cell_bold), Paragraph("<b>Deductions Description</b>", cell_bold), Paragraph("<b>Amount (INR)</b>", cell_bold)],
-        [Paragraph("Basic Salary", cell_normal), Paragraph(f"₹{salary_slip.basic_salary:,.2f}", cell_normal), Paragraph("Provident Fund (PF)", cell_normal), Paragraph(f"₹{salary_slip.deductions * Decimal('0.6'):,.2f}", cell_normal)],
-        [Paragraph("HRA & Special Allowances", cell_normal), Paragraph(f"₹{salary_slip.allowances:,.2f}", cell_normal), Paragraph("Professional Tax / Insurance", cell_normal), Paragraph(f"₹{salary_slip.deductions * Decimal('0.4'):,.2f}", cell_normal)],
+        [Paragraph("<b>Earnings Description</b>", cell_bold), Paragraph("<b>Amount (INR)</b>", cell_bold), Paragraph("<b>Deductions Description</b>", cell_bold), Paragraph("<b>Amount (INR)</b>", cell_bold)],
+        [Paragraph("Basic Salary", cell_normal), Paragraph(f"₹{salary_slip.basic_salary:,.2f}", cell_normal), Paragraph("Provident Fund (PF)", cell_normal), Paragraph(f"₹{(salary_slip.deductions * Decimal('0.6')):,.2f}", cell_normal)],
+        [Paragraph("HRA & Allowances", cell_normal), Paragraph(f"₹{salary_slip.allowances:,.2f}", cell_normal), Paragraph("Professional Tax / Insurance", cell_normal), Paragraph(f"₹{(salary_slip.deductions * Decimal('0.4')):,.2f}", cell_normal)],
         [Paragraph("<b>Total Gross Earnings</b>", cell_bold), Paragraph(f"<b>₹{(salary_slip.basic_salary + salary_slip.allowances):,.2f}</b>", cell_bold), Paragraph("<b>Total Deductions</b>", cell_bold), Paragraph(f"<b>₹{salary_slip.deductions:,.2f}</b>", cell_bold)]
     ]
 
     breakdown_table = Table(breakdown_data, colWidths=[150, 120, 150, 120])
     breakdown_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1E293B')),
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#881337')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#CBD5E1')),
-        ('BACKGROUND', (0,-1), (-1,-1), colors.HexColor('#F1F5F9')),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#D6D3D1')),
+        ('BACKGROUND', (0,-1), (-1,-1), colors.HexColor('#F5F5F4')),
         ('TOPPADDING', (0,0), (-1,-1), 7),
         ('BOTTOMPADDING', (0,0), (-1,-1), 7),
     ]))
@@ -130,14 +131,14 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     # Net Salary Summary Box
     net_data = [
         [
-            Paragraph("<b>NET TAKE-HOME SALARY:</b>", ParagraphStyle('NetLbl', parent=styles['Heading2'], fontSize=12, textColor=colors.HexColor('#1E3A8A'))),
+            Paragraph("<b>NET TAKE-HOME SALARY:</b>", ParagraphStyle('NetLbl', parent=styles['Heading2'], fontSize=12, textColor=colors.HexColor('#881337'))),
             Paragraph(f"<b>₹{salary_slip.net_salary:,.2f}</b>", ParagraphStyle('NetVal', parent=styles['Heading1'], fontSize=16, textColor=colors.HexColor('#15803D'), alignment=2))
         ]
     ]
     net_table = Table(net_data, colWidths=[250, 290])
     net_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#EFF6FF')),
-        ('BOX', (0,0), (-1,-1), 1.5, colors.HexColor('#3B82F6')),
+        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#FFF1F2')),
+        ('BOX', (0,0), (-1,-1), 1.5, colors.HexColor('#E11D48')),
         ('TOPPADDING', (0,0), (-1,-1), 10),
         ('BOTTOMPADDING', (0,0), (-1,-1), 10),
     ]))
@@ -146,7 +147,7 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
 
     # Signatures
     sig_data = [
-        [Paragraph("__________________________<br/><b>Employee Signature</b>", cell_normal), Paragraph("__________________________<br/><b>Authorized Signatory (Dahera HR)</b>", cell_normal)]
+        [Paragraph("__________________________<br/><b>Employee Signature</b>", cell_normal), Paragraph("__________________________<br/><b>Authorized Signatory (Thahira HR)</b>", cell_normal)]
     ]
     sig_table = Table(sig_data, colWidths=[270, 270])
     elements.append(sig_table)

@@ -28,18 +28,18 @@ class User(AbstractUser):
         unique=True,
         null=True,
         blank=True,
-        help_text="Unique Employee ID (e.g., DEG-101)"
+        help_text="Unique Employee ID (e.g., THG-M-01 or THG-F-01)"
     )
     designation = models.CharField(max_length=100, default='Software Engineer', blank=True)
     department = models.CharField(max_length=100, default='Engineering', blank=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     date_of_joining = models.DateField(null=True, blank=True)
-    bio = models.TextField(blank=True, default="Dedicated team member at Dahera Groups.")
+    bio = models.TextField(blank=True, default="Dedicated team member at Thahira Groups.")
     base_salary = models.DecimalField(max_digits=12, decimal_places=2, default=50000.00)
 
     def get_scheduled_login_time(self) -> str:
         """
-        Returns string representation of scheduled login time based on gender requirement:
+        Returns scheduled login time requirement:
         - Male: 10:00 AM
         - Female: 09:30 AM
         """

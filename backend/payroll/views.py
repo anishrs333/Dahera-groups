@@ -27,7 +27,7 @@ class SalarySlipViewSet(viewsets.ModelViewSet):
     def download_pdf(self, request, pk=None):
         salary_slip = self.get_object()
         pdf_bytes = generate_salary_slip_pdf(salary_slip)
-        filename = f"Dahera_Salary_Slip_{salary_slip.employee.employee_id or salary_slip.employee.id}_{salary_slip.get_month_name()}_{salary_slip.year}.pdf"
+        filename = f"Thahira_Salary_Slip_{salary_slip.employee.employee_id or salary_slip.employee.id}_{salary_slip.get_month_name()}_{salary_slip.year}.pdf"
 
         response = HttpResponse(pdf_bytes, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'

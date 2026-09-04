@@ -13,9 +13,9 @@ const MainLayout = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center">
-        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <span className="text-sm font-medium text-slate-300">Initializing Dahera Groups Enterprise Portal...</span>
+      <div className="min-h-screen bg-[#FAF9F6] text-stone-900 flex flex-col items-center justify-center font-['Plus_Jakarta_Sans',sans-serif]">
+        <div className="w-10 h-10 border-4 border-rose-900 border-t-transparent rounded-full animate-spin mb-4" />
+        <span className="text-xs font-bold text-stone-700">Initializing Thahira Groups Enterprise Portal...</span>
       </div>
     );
   }
@@ -27,7 +27,7 @@ const MainLayout = () => {
   const isAdmin = user.role === 'ADMIN' || user.is_superuser;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-[#FAF9F6] flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
       <Navbar onMobileMenuToggle={() => setMobileOpen(!mobileOpen)} />
 
       <div className="flex flex-1 max-w-7xl w-full mx-auto">

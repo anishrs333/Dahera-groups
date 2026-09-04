@@ -18,20 +18,21 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
     email: '',
     first_name: '',
     last_name: '',
-    password: 'Employee@123',
+    password: '',
     gender: 'MALE',
     role: 'EMPLOYEE',
-    employee_id: 'DHG-M-04',
+    employee_id: 'THG-M-01',
+    phone: '',
     designation: 'Software Engineer',
     department: 'Engineering',
     base_salary: '60000',
-    bio: 'Dedicated team member at Dahera Groups.'
+    bio: 'Dedicated team member at Thahira Groups.'
   });
 
   const handleOpenAddModal = () => {
     const maleCount = employees.filter(emp => emp.gender === 'MALE').length + 1;
     const formattedNum = maleCount >= 10 ? `${maleCount}` : `0${maleCount}`;
-    const initialId = `DHG-M-${formattedNum}`;
+    const initialId = `THG-M-${formattedNum}`;
     
     setNewEmp({
       username: '',
@@ -46,7 +47,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
       designation: 'Software Engineer',
       department: 'Engineering',
       base_salary: '60000',
-      bio: 'Dedicated team member at Dahera Groups.'
+      bio: 'Dedicated team member at Thahira Groups.'
     });
     setAddMsg('');
     setShowAddModal(true);
@@ -111,7 +112,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
       setShowAddModal(false);
       fetchData();
     } catch (err) {
-      setAddMsg(err.response?.data?.detail || 'Error creating employee. Check if email or ID is unique.');
+      setAddMsg(err.response?.data?.detail || 'Error creating employee. Verify unique email/ID.');
     }
   };
 
@@ -126,7 +127,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
     }
   };
 
-  // Robust PDF Blob Download for Admin
+  // Robust PDF Blob Download
   const handleDownloadPdf = async (slipId, monthName, year, employeeId) => {
     setDownloadingId(slipId);
     try {
@@ -137,7 +138,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `Dahera_Salary_Slip_${employeeId || 'EMP'}_${monthName}_${year}.pdf`);
+      link.setAttribute('download', `Thahira_Salary_Slip_${employeeId || 'EMP'}_${monthName}_${year}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -165,39 +166,39 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
   if (loading) {
     return (
-      <div className="p-8 text-center text-slate-500 flex flex-col items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <span>Loading Admin Control Panel...</span>
+      <div className="p-8 text-center text-stone-500 flex flex-col items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-4 border-rose-900 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <span>Loading Thahira Groups Admin Console...</span>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 font-['Inter',sans-serif]">
+    <div className="space-y-6 font-['Plus_Jakarta_Sans',sans-serif]">
       
       {/* Executive Command Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-[#4C0519] via-[#881337] to-[#991B1B] text-white rounded-3xl p-6 md:p-8 shadow-xl border border-rose-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-blue-400 text-xs font-bold uppercase tracking-wider mb-1.5">
+          <div className="flex items-center gap-2 text-rose-200 text-xs font-bold uppercase tracking-wider mb-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <span>Admin Executive Dashboard</span>
           </div>
-          <h1 className="text-2xl font-black tracking-tight">Dahera Groups Executive Control Panel</h1>
-          <p className="text-slate-300 text-xs mt-1">Manage staff directory, leave approvals queue, and monthly payroll issuance.</p>
+          <h1 className="text-2xl font-black tracking-tight">Thahira Groups Executive Control Panel</h1>
+          <p className="text-rose-100 text-xs mt-1">Manage employee profiles, leave request approvals, and monthly salary slips.</p>
         </div>
         
         <div className="flex items-center gap-3">
           <button
             onClick={handleOpenAddModal}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2"
+            className="bg-white hover:bg-rose-50 text-[#881337] font-black px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg flex items-center gap-2"
           >
             <UserPlus className="w-4 h-4" />
-            <span>Add New Staff</span>
+            <span>Add New Employee</span>
           </button>
           
           <button
             onClick={() => setShowSlipModal(true)}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-emerald-600/30 flex items-center gap-2"
+            className="bg-rose-950/60 hover:bg-rose-950 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all border border-white/20 flex items-center gap-2"
           >
             <Receipt className="w-4 h-4" />
             <span>Issue Payslip</span>
@@ -208,48 +209,48 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
       {/* Strategic Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Employees</span>
-            <span className="text-2xl font-black text-slate-900">{totalEmployees}</span>
-            <span className="text-xs text-slate-500 block mt-1">
-              <strong className="text-blue-600">{maleCount}</strong> Male (10 AM) • <strong className="text-purple-600">{femaleCount}</strong> Female (9:30 AM)
+            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">Total Staff</span>
+            <span className="text-2xl font-black text-stone-900">{totalEmployees}</span>
+            <span className="text-xs text-stone-500 block mt-1">
+              <strong className="text-rose-900">{maleCount}</strong> Male (10 AM) • <strong className="text-amber-800">{femaleCount}</strong> Female (9:30 AM)
             </span>
           </div>
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+          <div className="p-3 bg-rose-50 text-rose-900 rounded-xl">
             <Users className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Pending Leave Queue</span>
+            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">Pending Leave Queue</span>
             <span className="text-2xl font-black text-amber-600">{pendingLeaves}</span>
-            <span className="text-xs text-slate-500 block mt-1">Awaiting HR Action</span>
+            <span className="text-xs text-stone-500 block mt-1">Awaiting HR Approval</span>
           </div>
-          <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
+          <div className="p-3 bg-amber-50 text-amber-700 rounded-xl">
             <CalendarDays className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Monthly Payroll</span>
-            <span className="text-2xl font-black text-emerald-600">₹{totalPayroll.toLocaleString('en-IN')}</span>
-            <span className="text-xs text-slate-500 block mt-1">Total Payslips Issued</span>
+            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">Monthly Payroll</span>
+            <span className="text-2xl font-black text-emerald-700">₹{totalPayroll.toLocaleString('en-IN')}</span>
+            <span className="text-xs text-stone-500 block mt-1">Total Issued Payslips</span>
           </div>
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+          <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl">
             <DollarSign className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Shift Rules Active</span>
-            <span className="text-xs font-bold text-slate-800 block mt-1">Male: <strong className="text-blue-600">10:00 AM</strong></span>
-            <span className="text-xs font-bold text-slate-800 block mt-0.5">Female: <strong className="text-purple-600">9:30 AM</strong></span>
+            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">Shift Rules Active</span>
+            <span className="text-xs font-bold text-stone-800 block mt-1">Male: <strong className="text-rose-900">10:00 AM</strong></span>
+            <span className="text-xs font-bold text-stone-800 block mt-0.5">Female: <strong className="text-amber-800">9:30 AM</strong></span>
           </div>
-          <div className="p-3 bg-slate-100 text-slate-700 rounded-xl">
+          <div className="p-3 bg-stone-100 text-stone-700 rounded-xl">
             <Clock className="w-6 h-6" />
           </div>
         </div>
@@ -258,24 +259,24 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
       {/* Leave Approval Queue */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-leaves') && (
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div className="bg-white rounded-3xl border border-stone-200 shadow-sm p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-stone-100 pb-4">
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Leave Requests Approval Queue</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Click Approve or Reject to process staff leave applications.</p>
+              <h2 className="text-lg font-bold text-stone-900">Leave Requests Approval Queue</h2>
+              <p className="text-xs text-stone-500 mt-0.5">Click Approve or Reject to process staff leave applications.</p>
             </div>
-            <span className="px-3 py-1 bg-amber-100 text-amber-800 font-bold text-xs rounded-full">
+            <span className="px-3 py-1 bg-amber-50 text-amber-800 font-bold text-xs rounded-full border border-amber-200">
               {pendingLeaves} Pending Action
             </span>
           </div>
 
           {leaves.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-6">No leave requests found.</p>
+            <p className="text-sm text-stone-400 text-center py-6">No leave requests found.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase bg-slate-50">
+                  <tr className="border-b border-stone-200 text-[11px] font-bold text-stone-500 uppercase bg-stone-50">
                     <th className="py-3 px-4">Employee</th>
                     <th className="py-3 px-4">Type</th>
                     <th className="py-3 px-4">Duration</th>
@@ -284,26 +285,26 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody className="divide-y divide-stone-100 text-xs">
                   {leaves.map((l) => (
-                    <tr key={l.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-slate-900">
+                    <tr key={l.id} className="hover:bg-stone-50/80 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-stone-900">
                         {l.employee_details?.full_name || 'Employee'}
-                        <span className="block text-[11px] font-mono text-blue-600">{l.employee_details?.employee_id}</span>
+                        <span className="block text-[11px] font-mono text-rose-900">{l.employee_details?.employee_id}</span>
                       </td>
-                      <td className="py-3.5 px-4 font-semibold text-slate-700">
-                        <span className="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded">{l.leave_type}</span>
+                      <td className="py-3.5 px-4 font-semibold text-stone-700">
+                        <span className="px-2 py-0.5 bg-stone-100 border border-stone-200 rounded">{l.leave_type}</span>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600">
+                      <td className="py-3.5 px-4 text-stone-600">
                         {l.start_date} to {l.end_date}
-                        <span className="block text-[10px] text-slate-400">({l.total_days} days)</span>
+                        <span className="block text-[10px] text-stone-400">({l.total_days} days)</span>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-600 max-w-xs truncate">{l.reason}</td>
+                      <td className="py-3.5 px-4 text-stone-600 max-w-xs truncate">{l.reason}</td>
                       <td className="py-3.5 px-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          l.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' :
-                          l.status === 'REJECTED' ? 'bg-rose-100 text-rose-800' :
-                          'bg-amber-100 text-amber-800'
+                          l.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
+                          l.status === 'REJECTED' ? 'bg-rose-50 text-rose-800 border border-rose-200' :
+                          'bg-amber-50 text-amber-800 border border-amber-200'
                         }`}>
                           {l.status}
                         </span>
@@ -320,14 +321,14 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                             </button>
                             <button
                               onClick={() => handleRejectLeave(l.id)}
-                              className="px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-lg font-bold text-[11px] flex items-center gap-1 transition-colors shadow-xs"
+                              className="px-3 py-1 bg-rose-800 hover:bg-rose-700 text-white rounded-lg font-bold text-[11px] flex items-center gap-1 transition-colors shadow-xs"
                             >
                               <XCircle className="w-3.5 h-3.5" />
                               <span>Reject</span>
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[11px] text-slate-400 font-medium">Action Recorded</span>
+                          <span className="text-[11px] text-stone-400 font-medium">Action Recorded</span>
                         )}
                       </td>
                     </tr>
@@ -339,23 +340,23 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
         </div>
       )}
 
-      {/* Employee Staff Directory */}
+      {/* Staff Directory */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-employees') && (
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div className="bg-white rounded-3xl border border-stone-200 shadow-sm p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Dahera Employee & Shift Directory</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Active staff listing with assigned Employee IDs and Shift Times.</p>
+              <h2 className="text-lg font-bold text-stone-900">Thahira Employee Directory</h2>
+              <p className="text-xs text-stone-500 mt-0.5">Active staff listing with assigned Employee IDs and Shift Times.</p>
             </div>
             
             <div className="relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search staff, ID or dept..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 w-64 focus:outline-none focus:border-blue-600"
+                className="pl-9 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 w-64 focus:outline-none focus:border-[#881337]"
               />
             </div>
           </div>
@@ -363,7 +364,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase bg-slate-50">
+                <tr className="border-b border-stone-200 text-[11px] font-bold text-stone-500 uppercase bg-stone-50">
                   <th className="py-3 px-4">Employee ID</th>
                   <th className="py-3 px-4">Full Name & Email</th>
                   <th className="py-3 px-4">Gender & Shift Time</th>
@@ -372,32 +373,32 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                   <th className="py-3 px-4">Role</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
+              <tbody className="divide-y divide-stone-100 text-xs">
                 {filteredEmployees.map((emp) => (
-                  <tr key={emp.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3.5 px-4 font-black text-blue-600 font-mono">{emp.employee_id || 'N/A'}</td>
+                  <tr key={emp.id} className="hover:bg-stone-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-black text-rose-900 font-mono">{emp.employee_id || 'N/A'}</td>
                     <td className="py-3.5 px-4">
-                      <span className="font-bold text-slate-900 block">{emp.full_name}</span>
-                      <span className="text-[11px] text-slate-500">{emp.email}</span>
+                      <span className="font-bold text-stone-900 block">{emp.full_name}</span>
+                      <span className="text-[11px] text-stone-500">{emp.email}</span>
                     </td>
                     <td className="py-3.5 px-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                        emp.gender === 'FEMALE' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-blue-50 text-blue-700 border border-blue-200'
+                        emp.gender === 'FEMALE' ? 'bg-amber-50 text-amber-900 border border-amber-200' : 'bg-rose-50 text-rose-900 border border-rose-200'
                       }`}>
                         <Clock className="w-3 h-3" />
                         {emp.gender} • {emp.scheduled_login_time}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-700">
-                      <span className="font-semibold text-slate-800 block">{emp.designation}</span>
-                      <span className="text-[11px] text-slate-500">{emp.department}</span>
+                    <td className="py-3.5 px-4 text-stone-700">
+                      <span className="font-semibold text-stone-800 block">{emp.designation}</span>
+                      <span className="text-[11px] text-stone-500">{emp.department}</span>
                     </td>
-                    <td className="py-3.5 px-4 font-bold text-slate-800">
+                    <td className="py-3.5 px-4 font-bold text-stone-800">
                       ₹{parseFloat(emp.base_salary || 0).toLocaleString('en-IN')}
                     </td>
                     <td className="py-3.5 px-4">
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
-                        emp.role === 'ADMIN' ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-700'
+                        emp.role === 'ADMIN' ? 'bg-rose-100 text-rose-950' : 'bg-stone-100 text-stone-700'
                       }`}>
                         {emp.role}
                       </span>
@@ -412,15 +413,15 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
       {/* Salary Slips Log */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-payroll') && (
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div className="bg-white rounded-3xl border border-stone-200 shadow-sm p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-stone-100 pb-4">
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Issued Salary Slips</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Complete record of monthly payroll statements.</p>
+              <h2 className="text-lg font-bold text-stone-900">Issued Salary Slips</h2>
+              <p className="text-xs text-stone-500 mt-0.5">Complete record of monthly payroll statements.</p>
             </div>
             <button
               onClick={() => setShowSlipModal(true)}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-colors flex items-center gap-1.5 shadow-md shadow-emerald-600/20"
+              className="bg-[#881337] hover:bg-[#991B1B] text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-colors flex items-center gap-1.5 shadow-md shadow-rose-950/20"
             >
               <Receipt className="w-4 h-4" />
               <span>Generate New Slip</span>
@@ -430,7 +431,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase bg-slate-50">
+                <tr className="border-b border-stone-200 text-[11px] font-bold text-stone-500 uppercase bg-stone-50">
                   <th className="py-3 px-4">Employee</th>
                   <th className="py-3 px-4">Shift Schedule</th>
                   <th className="py-3 px-4">Pay Period</th>
@@ -440,33 +441,33 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                   <th className="py-3 px-4 text-right">PDF Download</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
+              <tbody className="divide-y divide-stone-100 text-xs">
                 {slips.map((slip) => (
-                  <tr key={slip.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                  <tr key={slip.id} className="hover:bg-stone-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-stone-900">
                       {slip.employee_details?.full_name}
-                      <span className="block text-[11px] font-mono text-blue-600">{slip.employee_details?.employee_id}</span>
+                      <span className="block text-[11px] font-mono text-rose-900">{slip.employee_details?.employee_id}</span>
                     </td>
-                    <td className="py-3.5 px-4 font-bold text-slate-700">
+                    <td className="py-3.5 px-4 font-bold text-stone-700">
                       {slip.scheduled_login_time}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-700 font-semibold">
+                    <td className="py-3.5 px-4 text-stone-700 font-semibold">
                       {slip.month_name} {slip.year}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-700">₹{parseFloat(slip.basic_salary).toLocaleString('en-IN')}</td>
-                    <td className="py-3.5 px-4 font-black text-emerald-600">₹{parseFloat(slip.net_salary).toLocaleString('en-IN')}</td>
+                    <td className="py-3.5 px-4 text-stone-700">₹{parseFloat(slip.basic_salary).toLocaleString('en-IN')}</td>
+                    <td className="py-3.5 px-4 font-black text-emerald-700">₹{parseFloat(slip.net_salary).toLocaleString('en-IN')}</td>
                     <td className="py-3.5 px-4">
-                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full">
+                      <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold rounded-full">
                         {slip.status}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      {/* Robust Blob PDF Download */}
+                      {/* PDF Blob Download */}
                       <button
                         type="button"
                         disabled={downloadingId === slip.id}
                         onClick={() => handleDownloadPdf(slip.id, slip.month_name, slip.year, slip.employee_details?.employee_id)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition-colors disabled:opacity-50"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-200 rounded-xl text-xs font-bold transition-colors disabled:opacity-50"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>{downloadingId === slip.id ? 'Downloading...' : 'Download PDF'}</span>
@@ -482,12 +483,12 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
       {/* Add Employee Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto border border-slate-200">
-            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">Add New Employee Account</h3>
+        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-stone-900 border-b border-stone-100 pb-3">Add New Employee Account</h3>
             
             {addMsg && (
-              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl">
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl">
                 {addMsg}
               </div>
             )}
@@ -495,72 +496,72 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
             <form onSubmit={handleAddEmployeeSubmit} className="space-y-3.5 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">First Name</label>
+                  <label className="block text-stone-700 font-bold mb-1">First Name</label>
                   <input
                     type="text"
                     required
                     value={newEmp.first_name}
                     onChange={(e) => setNewEmp({...newEmp, first_name: e.target.value})}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Last Name</label>
+                  <label className="block text-stone-700 font-bold mb-1">Last Name</label>
                   <input
                     type="text"
                     required
                     value={newEmp.last_name}
                     onChange={(e) => setNewEmp({...newEmp, last_name: e.target.value})}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-700 font-bold mb-1">Email Address</label>
+                <label className="block text-stone-700 font-bold mb-1">Email Address</label>
                 <input
                   type="email"
                   required
                   value={newEmp.username}
                   onChange={(e) => setNewEmp({...newEmp, username: e.target.value, email: e.target.value})}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Gender (Sets Shift Time)</label>
+                  <label className="block text-stone-700 font-bold mb-1">Gender (Sets Shift Time)</label>
                   <select
                     value={newEmp.gender}
                     onChange={(e) => {
                       const g = e.target.value;
-                      const prefix = g === 'MALE' ? 'DHG-M-' : 'DHG-F-';
+                      const prefix = g === 'MALE' ? 'THG-M-' : 'THG-F-';
                       const count = employees.filter(emp => emp.gender === g).length + 1;
                       const formattedNum = count >= 10 ? `${count}` : `0${count}`;
                       setNewEmp({...newEmp, gender: g, employee_id: `${prefix}${formattedNum}`});
                     }}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 text-blue-700 font-bold rounded-xl"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 text-rose-900 font-bold rounded-xl"
                   >
                     <option value="MALE">MALE (Shift: 10:00 AM)</option>
                     <option value="FEMALE">FEMALE (Shift: 9:30 AM)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Employee ID (Auto-Generated)</label>
+                  <label className="block text-stone-700 font-bold mb-1">Employee ID (Auto-Generated)</label>
                   <input
                     type="text"
                     required
                     value={newEmp.employee_id}
                     onChange={(e) => setNewEmp({...newEmp, employee_id: e.target.value})}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 text-slate-900 font-mono font-bold rounded-xl"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 text-stone-900 font-mono font-bold rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">
-                    Mobile Number <span className="text-emerald-600 font-semibold">(Initial Password)</span>
+                  <label className="block text-stone-700 font-bold mb-1">
+                    Mobile Number <span className="text-rose-900 font-semibold">(Initial Password)</span>
                   </label>
                   <input
                     type="text"
@@ -568,47 +569,47 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                     placeholder="e.g. 9876543210"
                     value={newEmp.phone}
                     onChange={(e) => setNewEmp({...newEmp, phone: e.target.value})}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 font-mono rounded-xl text-slate-900"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 font-mono rounded-xl text-stone-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Designation</label>
+                  <label className="block text-stone-700 font-bold mb-1">Designation</label>
                   <input
                     type="text"
                     required
                     value={newEmp.designation}
                     onChange={(e) => setNewEmp({...newEmp, designation: e.target.value})}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                   />
                 </div>
               </div>
 
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px] text-emerald-800 font-medium">
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-900 font-medium">
                 💡 <strong>Beginner Note:</strong> The employee's <strong>Mobile Number</strong> will be set as their initial password for portal login.
               </div>
 
               <div>
-                <label className="block text-slate-700 font-bold mb-1">Employee Bio</label>
+                <label className="block text-stone-700 font-bold mb-1">Employee Bio</label>
                 <textarea
                   rows="2"
                   value={newEmp.bio}
                   onChange={(e) => setNewEmp({...newEmp, bio: e.target.value})}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                   placeholder="Professional bio..."
                 ></textarea>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="flex justify-end gap-2 pt-2 border-t border-stone-100">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl"
+                  className="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-xl"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md shadow-blue-600/20"
+                  className="px-4 py-2.5 bg-[#881337] hover:bg-[#991B1B] text-white font-bold rounded-xl shadow-md shadow-rose-950/20"
                 >
                   Create Employee
                 </button>
@@ -620,13 +621,13 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
       {/* Generate Salary Slip Modal */}
       {showSlipModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">Generate Salary Slip</h3>
+        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <h3 className="text-lg font-bold text-stone-900 border-b border-stone-100 pb-3">Generate Salary Slip</h3>
 
             <form onSubmit={handleGenerateSlipSubmit} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-slate-700 font-bold mb-1">Select Employee</label>
+                <label className="block text-stone-700 font-bold mb-1">Select Employee</label>
                 <select
                   required
                   value={slipForm.employee}
@@ -638,7 +639,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                       basic_salary: selectedEmp ? selectedEmp.base_salary : slipForm.basic_salary
                     });
                   }}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl font-medium"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-300 text-stone-900 rounded-xl font-medium"
                 >
                   <option value="">-- Choose Employee --</option>
                   {employees.map(e => (
@@ -651,11 +652,11 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Month</label>
+                  <label className="block text-stone-700 font-bold mb-1">Month</label>
                   <select
                     value={slipForm.month}
                     onChange={(e) => setSlipForm({...slipForm, month: e.target.value})}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                   >
                     <option value="1">January</option>
                     <option value="2">February</option>
@@ -672,59 +673,59 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Year</label>
+                  <label className="block text-stone-700 font-bold mb-1">Year</label>
                   <input
                     type="number"
                     value={slipForm.year}
                     onChange={(e) => setSlipForm({...slipForm, year: e.target.value})}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-700 font-bold mb-1">Basic Salary (INR)</label>
+                <label className="block text-stone-700 font-bold mb-1">Basic Salary (INR)</label>
                 <input
                   type="number"
                   required
                   value={slipForm.basic_salary}
                   onChange={(e) => setSlipForm({...slipForm, basic_salary: e.target.value})}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Allowances (INR)</label>
+                  <label className="block text-stone-700 font-bold mb-1">Allowances (INR)</label>
                   <input
                     type="number"
                     value={slipForm.allowances}
                     onChange={(e) => setSlipForm({...slipForm, allowances: e.target.value})}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Deductions (INR)</label>
+                  <label className="block text-stone-700 font-bold mb-1">Deductions (INR)</label>
                   <input
                     type="number"
                     value={slipForm.deductions}
                     onChange={(e) => setSlipForm({...slipForm, deductions: e.target.value})}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="flex justify-end gap-2 pt-2 border-t border-stone-100">
                 <button
                   type="button"
                   onClick={() => setShowSlipModal(false)}
-                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl"
+                  className="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-xl"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-md shadow-emerald-600/20"
+                  className="px-4 py-2.5 bg-[#881337] hover:bg-[#991B1B] text-white font-bold rounded-xl shadow-md shadow-rose-950/20"
                 >
                   Generate Payslip
                 </button>
