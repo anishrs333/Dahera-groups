@@ -31,7 +31,7 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=False, allow_blank=True, allow_null=True)
     first_name = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     last_name = serializers.CharField(required=False, allow_blank=True, allow_null=True)
-    password = serializers.CharField(write_only=True, required=False)
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
     employee_id = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     class Meta:
@@ -85,7 +85,7 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
             count += 1
 
         # Initial Password = Employee Mobile Number
-        initial_password = provided_password or phone_number or '9876543210'
+        initial_password = (provided_password or '').strip() or phone_number or '9876543210'
 
         user = User.objects.create(**validated_data)
         user.set_password(initial_password)
@@ -96,8 +96,8 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password', None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        if password:
-            instance.set_password(password)
+        if password and password.strip():
+            instance.set_password(password.strip())
         instance.save()
         return instance
 

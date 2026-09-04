@@ -137,6 +137,9 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
         email: formattedEmail,
         phone: (newEmp.phone || '').trim()
       };
+      if (!payload.password || !payload.password.trim()) {
+        delete payload.password;
+      }
       await api.post('/users/employees/', payload);
       setShowAddModal(false);
       fetchData();
@@ -660,7 +663,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-stone-700 font-bold mb-1">
-                    Mobile Number <span className="text-rose-800 font-semibold">(Initial Password)</span>
+                    Mobile Number <span className="text-stone-500 font-normal">(Initial Password)</span>
                   </label>
                   <input
                     type="text"
@@ -681,10 +684,6 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                     className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
                   />
                 </div>
-              </div>
-
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-900 font-medium">
-                💡 <strong>Beginner Note:</strong> The employee's <strong>Mobile Number</strong> will be set as their initial password for portal login.
               </div>
 
               <div>
