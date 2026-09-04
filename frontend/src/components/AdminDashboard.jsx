@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Users, CalendarDays, Receipt, UserPlus, CheckCircle, XCircle, Clock, Search, ShieldCheck, DollarSign, Download, UserX, UserCheck } from 'lucide-react';
+import { Users, CalendarDays, Receipt, UserPlus, CheckCircle, XCircle, Clock, Search, ShieldCheck, DollarSign, Download, UserX, UserCheck, Calculator } from 'lucide-react';
 
 export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false }) => {
   const [employees, setEmployees] = useState([]);
@@ -53,15 +53,16 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
     setShowAddModal(true);
   };
 
-  // Modal state for generating salary slip
+  // Modal state for generating salary slip with calendar days & leave deductions
   const [showSlipModal, setShowSlipModal] = useState(false);
   const [slipForm, setSlipForm] = useState({
     employee: '',
     month: '9',
     year: '2026',
-    basic_salary: '50000',
-    allowances: '15000',
-    deductions: '3000'
+    basic_salary: '30000',
+    leave_days_deducted: '1',
+    allowances: '5000',
+    deductions: '1000'
   });
 
   const fetchData = async () => {
@@ -175,6 +176,14 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
       const response = await api.get(`/payroll/slips/${slipId}/download_pdf/`, {
         responseType: 'blob',
       });
+
+      if (response.data.type && response.data.type.includes('json')) {
+        const errorText = await response.data.text();
+        const json = JSON.parse(errorText);
+        alert(json.detail || "Error downloading PDF.");
+        return;
+      }
+
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -183,9 +192,17 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(url);
+      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
     } catch (err) {
       console.error("PDF download error:", err);
+      if (err.response && err.response.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text();
+          const json = JSON.parse(text);
+          alert(json.detail || "Failed to download PDF salary slip.");
+          return;
+        } catch (e) {}
+      }
       alert("Failed to download PDF salary slip.");
     } finally {
       setDownloadingId(null);
@@ -204,6 +221,16 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
     (e.employee_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (e.department || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Real-time calculation preview in modal
+  const calcBase = parseFloat(slipForm.basic_salary || 0);
+  const calcDaysInMonth = 30; // approx
+  const calcDailyRate = calcBase > 0 ? (calcBase / calcDaysInMonth) : 0;
+  const calcLeaveDays = parseFloat(slipForm.leave_days_deducted || 0);
+  const calcLeaveDeduction = calcLeaveDays * calcDailyRate;
+  const calcAllowances = parseFloat(slipForm.allowances || 0);
+  const calcDeductions = parseFloat(slipForm.deductions || 0);
+  const calcNetSalary = (calcBase - calcLeaveDeduction) + calcAllowances - calcDeductions;
 
   if (loading) {
     return (
@@ -229,7 +256,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
             <span>Admin Executive Dashboard</span>
           </div>
           <h1 className="text-2xl font-black tracking-tight">Thahira Groups Executive Control Panel</h1>
-          <p className="text-rose-100 text-xs mt-1">Manage employee profiles, termination status, leave request approvals, and monthly salary slips.</p>
+          <p className="text-rose-100 text-xs mt-1">Manage employee profiles, leave request approvals, and month calendar salary slip deductions.</p>
         </div>
         
         <div className="flex items-center gap-3">
@@ -385,7 +412,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
         </div>
       )}
 
-      {/* Staff Directory with Termination Controls */}
+      {/* Staff Directory */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-employees') && (
         <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
@@ -482,8 +509,8 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
         <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
           <div className="flex items-center justify-between border-b border-stone-100 pb-4">
             <div>
-              <h2 className="text-lg font-bold">Issued Salary Slips</h2>
-              <p className={`text-xs mt-0.5 ${textMuted}`}>Complete record of monthly payroll statements.</p>
+              <h2 className="text-lg font-bold">Issued Salary Slips & Calendar Deductions</h2>
+              <p className={`text-xs mt-0.5 ${textMuted}`}>Complete record of monthly payroll statements with calendar rate calculations.</p>
             </div>
             <button
               onClick={() => setShowSlipModal(true)}
@@ -499,9 +526,9 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
               <thead>
                 <tr className={`border-b text-[11px] font-bold uppercase ${darkMode ? 'border-stone-800 text-stone-400 bg-stone-950' : 'border-stone-200 text-stone-500 bg-stone-50'}`}>
                   <th className="py-3 px-4">Employee</th>
-                  <th className="py-3 px-4">Shift Schedule</th>
-                  <th className="py-3 px-4">Pay Period</th>
-                  <th className="py-3 px-4">Basic Salary</th>
+                  <th className="py-3 px-4">Month & Days</th>
+                  <th className="py-3 px-4">Daily Rate</th>
+                  <th className="py-3 px-4">Leave Deduction</th>
                   <th className="py-3 px-4">Net Salary</th>
                   <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4 text-right">PDF Download</th>
@@ -514,13 +541,17 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                       {slip.employee_details?.full_name}
                       <span className="block text-[11px] font-mono text-rose-800">{slip.employee_details?.employee_id}</span>
                     </td>
-                    <td className="py-3.5 px-4 font-bold">
-                      {slip.scheduled_login_time}
-                    </td>
                     <td className="py-3.5 px-4 font-semibold">
                       {slip.month_name} {slip.year}
+                      <span className="block text-[10px] text-stone-500">{slip.days_in_month || 30} Days in Month</span>
                     </td>
-                    <td className="py-3.5 px-4">₹{parseFloat(slip.basic_salary).toLocaleString('en-IN')}</td>
+                    <td className="py-3.5 px-4 font-mono font-bold text-stone-700">
+                      ₹{parseFloat(slip.daily_rate || 0).toLocaleString('en-IN')}/day
+                    </td>
+                    <td className="py-3.5 px-4 font-mono font-bold text-rose-800">
+                      -₹{parseFloat(slip.leave_deduction_amount || 0).toLocaleString('en-IN')}
+                      <span className="block text-[10px] font-sans font-normal text-stone-500">({slip.leave_days_deducted || 0} day leave)</span>
+                    </td>
                     <td className="py-3.5 px-4 font-black text-emerald-600">₹{parseFloat(slip.net_salary).toLocaleString('en-IN')}</td>
                     <td className="py-3.5 px-4">
                       <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold rounded-full">
@@ -687,11 +718,11 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
         </div>
       )}
 
-      {/* Generate Salary Slip Modal */}
+      {/* Generate Salary Slip Modal with Calendar & Leave Deduction Calculation */}
       {showSlipModal && (
         <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 className="text-lg font-bold text-stone-900 border-b border-stone-100 pb-3">Generate Salary Slip</h3>
+          <div className="bg-white border border-stone-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-stone-900 border-b border-stone-100 pb-3">Generate Salary Slip (Calendar Deductions Enabled)</h3>
 
             <form onSubmit={handleGenerateSlipSubmit} className="space-y-3.5 text-xs">
               <div>
@@ -720,7 +751,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-stone-700 font-bold mb-1">Month</label>
+                  <label className="block text-stone-700 font-bold mb-1">Pay Month</label>
                   <select
                     value={slipForm.month}
                     onChange={(e) => setSlipForm({...slipForm, month: e.target.value})}
@@ -741,7 +772,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   </select>
                 </div>
                 <div>
-                  <label className="block text-stone-700 font-bold mb-1">Year</label>
+                  <label className="block text-stone-700 font-bold mb-1">Pay Year</label>
                   <input
                     type="number"
                     value={slipForm.year}
@@ -751,15 +782,50 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                 </div>
               </div>
 
-              <div>
-                <label className="block text-stone-700 font-bold mb-1">Basic Salary (INR)</label>
-                <input
-                  type="number"
-                  required
-                  value={slipForm.basic_salary}
-                  onChange={(e) => setSlipForm({...slipForm, basic_salary: e.target.value})}
-                  className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-stone-700 font-bold mb-1">Monthly Basic Salary (INR)</label>
+                  <input
+                    type="number"
+                    required
+                    value={slipForm.basic_salary}
+                    onChange={(e) => setSlipForm({...slipForm, basic_salary: e.target.value})}
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-stone-700 font-bold mb-1">
+                    Leave Days Deducted <span className="text-rose-800 font-semibold">(Absence)</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={slipForm.leave_days_deducted}
+                    onChange={(e) => setSlipForm({...slipForm, leave_days_deducted: e.target.value})}
+                    placeholder="e.g. 1 or 2 days"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 text-rose-900 rounded-xl text-stone-900 font-bold"
+                  />
+                </div>
+              </div>
+
+              {/* Real-time Calculation Breakdown Box */}
+              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs space-y-1.5">
+                <div className="flex items-center gap-1.5 text-rose-900 font-bold text-[11px] mb-1">
+                  <Calculator className="w-4 h-4 text-rose-800" />
+                  <span>Calendar Rate & Net Salary Live Breakdown</span>
+                </div>
+                <div className="flex justify-between text-stone-700">
+                  <span>Month Days: <strong>30 Days</strong></span>
+                  <span>Daily Rate: <strong>₹{calcDailyRate.toFixed(2)}/day</strong></span>
+                </div>
+                <div className="flex justify-between text-stone-700">
+                  <span>Leave Deduction ({calcLeaveDays} day leave):</span>
+                  <strong className="text-rose-900">-₹{calcLeaveDeduction.toFixed(2)}</strong>
+                </div>
+                <div className="flex justify-between text-stone-900 border-t border-rose-200 pt-1 font-bold">
+                  <span>Calculated Net Salary:</span>
+                  <span className="text-emerald-700 text-sm font-black">₹{calcNetSalary.toFixed(2)}</span>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

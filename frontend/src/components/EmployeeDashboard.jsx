@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { Clock, UserCheck, CalendarDays, Receipt, Download, Send, Lock, KeyRound, CheckCircle, ShieldCheck } from 'lucide-react';
+import { Clock, UserCheck, CalendarDays, Receipt, Download, Send, Lock, KeyRound, CheckCircle, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) => {
   const { user } = useAuth();
@@ -109,13 +109,22 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
     }
   };
 
-  // Blob PDF Download
+  // Robust PDF Blob Download with Error Parsing & Anchor Trigger
   const handleDownloadPdf = async (slipId, monthName, year, employeeId) => {
     setDownloadingId(slipId);
     try {
       const response = await api.get(`/payroll/slips/${slipId}/download_pdf/`, {
         responseType: 'blob',
       });
+      
+      // Check if response blob is actually a JSON error payload
+      if (response.data.type && response.data.type.includes('json')) {
+        const errorText = await response.data.text();
+        const json = JSON.parse(errorText);
+        alert(json.detail || "Error downloading PDF.");
+        return;
+      }
+
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -124,9 +133,17 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(url);
+      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
     } catch (err) {
       console.error("PDF download error:", err);
+      if (err.response && err.response.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text();
+          const json = JSON.parse(text);
+          alert(json.detail || "Failed to download PDF salary slip.");
+          return;
+        } catch (e) {}
+      }
       alert("Failed to download PDF salary slip.");
     } finally {
       setDownloadingId(null);
@@ -152,7 +169,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
   return (
     <div className="space-y-6 font-['Plus_Jakarta_Sans',sans-serif]">
 
-      {/* Employee Bio Card & Password Change Option */}
+      {/* Employee Bio Card */}
       {(subTab === 'dashboard' || subTab === 'all') && (
         <div className={`rounded-3xl border shadow-sm overflow-hidden ${cardBg}`}>
           
@@ -519,16 +536,16 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
         </div>
       )}
 
-      {/* Salary Slips & PDF Download Portal */}
+      {/* Salary Slips & Calendar Deductions Portal */}
       {(subTab === 'dashboard' || subTab === 'payroll') && (
         <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
             <div>
               <h2 className="text-lg font-bold">My Salary Slips</h2>
-              <p className={`text-xs mt-0.5 ${textMuted}`}>Official earnings statements with 1-click verified PDF download (Mobile & Desktop ready).</p>
+              <p className={`text-xs mt-0.5 ${textMuted}`}>Official earnings statements with month calendar rate calculations and 1-click PDF download.</p>
             </div>
             <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full w-fit">
-              Payroll Verified
+              Calendar & Payroll Verified
             </span>
           </div>
 
@@ -548,9 +565,25 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                     </span>
                   </div>
 
+                  {/* Calendar Breakdown Details Box */}
+                  <div className="p-3 bg-rose-50/70 border border-rose-200 rounded-xl text-xs space-y-1">
+                    <div className="flex justify-between items-center text-[11px]">
+                      <span className="text-stone-600 font-medium">Month Calendar Days:</span>
+                      <strong className="text-stone-900">{slip.days_in_month || 30} Days</strong>
+                    </div>
+                    <div className="flex justify-between items-center text-[11px]">
+                      <span className="text-stone-600 font-medium">Daily Salary Rate:</span>
+                      <strong className="text-stone-900">₹{parseFloat(slip.daily_rate || 0).toLocaleString('en-IN')}/day</strong>
+                    </div>
+                    <div className="flex justify-between items-center text-[11px]">
+                      <span className="text-rose-900 font-bold">Leave Days Deducted ({slip.leave_days_deducted || 0} days):</span>
+                      <strong className="text-rose-900 font-black">-₹{parseFloat(slip.leave_deduction_amount || 0).toLocaleString('en-IN')}</strong>
+                    </div>
+                  </div>
+
                   <div className={`grid grid-cols-3 gap-2 p-3 rounded-xl border text-xs ${cardBg}`}>
                     <div>
-                      <span className={`block text-[10px] ${textMuted}`}>BASIC</span>
+                      <span className={`block text-[10px] ${textMuted}`}>BASE SALARY</span>
                       <span className="font-semibold">₹{parseFloat(slip.basic_salary).toLocaleString('en-IN')}</span>
                     </div>
                     <div>
