@@ -43,7 +43,6 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        # Auto-fill missing username or email
         email_val = (attrs.get('email') or '').strip()
         username_val = (attrs.get('username') or '').strip()
 
@@ -62,7 +61,6 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         attrs['username'] = username_val
         attrs['email'] = email_val
 
-        # Ensure first_name
         if not attrs.get('first_name'):
             attrs['first_name'] = username_val.split('@')[0].capitalize()
 
@@ -73,7 +71,6 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         phone_number = (validated_data.get('phone') or '').strip()
         gender = validated_data.get('gender', 'MALE')
 
-        # Auto-generate next unique sequential employee_id (THG-M-01, THG-M-02, THG-F-01...)
         gender_prefix = 'THG-F-' if gender == 'FEMALE' else 'THG-M-'
         count = User.objects.filter(gender=gender).exclude(role='ADMIN').count() + 1
         
@@ -84,7 +81,6 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
                 break
             count += 1
 
-        # Initial Password = Employee Mobile Number
         initial_password = (provided_password or '').strip() or phone_number or '9876543210'
 
         user = User.objects.create(**validated_data)
@@ -106,11 +102,6 @@ class ChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True)
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """
-    JWT Serializer for Thahira Groups:
-    Authenticates via Email, Username, or Employee ID (THG-M-01 / THG-F-01).
-    Denies login if account is TERMINATED or INACTIVE.
-    """
     def validate(self, attrs):
         login_input = attrs.get('username', '').strip()
         if login_input:

@@ -26,11 +26,10 @@ class SalarySlip(models.Model):
     month = models.IntegerField(choices=MONTH_CHOICES)
     year = models.IntegerField(default=2026)
     
-    # Calendar & Daily Rate Calculations
-    days_in_month = models.IntegerField(default=30, help_text="Total calendar days in target month")
-    leave_days_deducted = models.DecimalField(max_digits=5, decimal_places=1, default=0.0, help_text="Leave/absence days deducted")
-    daily_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, help_text="Per day daily salary rate")
-    leave_deduction_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, help_text="Total salary deduction for leave days")
+    days_in_month = models.IntegerField(default=30)
+    leave_days_deducted = models.DecimalField(max_digits=5, decimal_places=1, default=0.0)
+    daily_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    leave_deduction_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
 
     basic_salary = models.DecimalField(max_digits=10, decimal_places=2)
     allowances = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
@@ -46,10 +45,6 @@ class SalarySlip(models.Model):
         unique_together = ['employee', 'month', 'year']
 
     def calculate_salary_details(self):
-        """
-        Calculates calendar days, daily rate, leave deductions, and net salary.
-        Example: Base 30,000 for 30 days = 1,000/day. 1 day leave = 1,000 deduction.
-        """
         try:
             self.days_in_month = calendar.monthrange(int(self.year), int(self.month))[1]
         except Exception:
@@ -62,7 +57,6 @@ class SalarySlip(models.Model):
 
         self.leave_deduction_amount = round(Decimal(str(self.leave_days_deducted or 0)) * self.daily_rate, 2)
         
-        # Net Salary = (Basic - Leave Deduction) + Allowances - Deductions
         gross_basic = Decimal(str(self.basic_salary or 0)) - self.leave_deduction_amount
         if gross_basic < Decimal('0.00'):
             gross_basic = Decimal('0.00')
