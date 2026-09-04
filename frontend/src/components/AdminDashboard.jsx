@@ -129,11 +129,30 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
     e.preventDefault();
     setAddMsg('');
     try {
-      await api.post('/users/employees/', newEmp);
+      const payload = {
+        ...newEmp,
+        username: newEmp.email.trim(),
+        email: newEmp.email.trim(),
+        phone: newEmp.phone.trim()
+      };
+      await api.post('/users/employees/', payload);
       setShowAddModal(false);
       fetchData();
     } catch (err) {
-      setAddMsg(err.response?.data?.detail || 'Error creating employee. Verify unique email/ID.');
+      console.error("Employee creation error:", err.response?.data);
+      let errMsg = 'Error creating employee.';
+      if (err.response?.data) {
+        if (typeof err.response.data === 'string') {
+          errMsg = err.response.data;
+        } else if (err.response.data.detail) {
+          errMsg = err.response.data.detail;
+        } else {
+          errMsg = Object.entries(err.response.data)
+            .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+            .join(' | ');
+        }
+      }
+      setAddMsg(errMsg);
     }
   };
 

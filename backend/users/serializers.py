@@ -27,6 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserCreateUpdateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
+    employee_id = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     class Meta:
         model = User
@@ -41,11 +42,16 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         phone_number = validated_data.get('phone', '').strip()
         gender = validated_data.get('gender', 'MALE')
 
-        # Sequential Employee ID Generation in Order (THG-M-01, THG-M-02... / THG-F-01, THG-F-02...)
+        # Auto-generate next unique sequential employee_id (THG-M-01, THG-M-02, THG-F-01...)
         gender_prefix = 'THG-F-' if gender == 'FEMALE' else 'THG-M-'
-        existing_count = User.objects.filter(gender=gender).exclude(role='ADMIN').count() + 1
-        num_str = f"{existing_count:02d}"
-        validated_data['employee_id'] = f"{gender_prefix}{num_str}"
+        count = User.objects.filter(gender=gender).exclude(role='ADMIN').count() + 1
+        
+        while True:
+            candidate_id = f"{gender_prefix}{count:02d}"
+            if not User.objects.filter(employee_id=candidate_id).exists():
+                validated_data['employee_id'] = candidate_id
+                break
+            count += 1
 
         # Initial Password = Employee Mobile Number
         initial_password = provided_password or phone_number or '9876543210'
