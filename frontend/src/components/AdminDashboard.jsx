@@ -30,7 +30,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
   });
 
   const handleOpenAddModal = () => {
-    const maleCount = employees.filter(emp => emp.gender === 'MALE').length + 1;
+    const maleCount = employees.filter(emp => emp.gender === 'MALE' && emp.role === 'EMPLOYEE').length + 1;
     const formattedNum = maleCount >= 10 ? `${maleCount}` : `0${maleCount}`;
     const initialId = `THG-M-${formattedNum}`;
     
@@ -582,7 +582,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                     onChange={(e) => {
                       const g = e.target.value;
                       const prefix = g === 'MALE' ? 'THG-M-' : 'THG-F-';
-                      const count = employees.filter(emp => emp.gender === g).length + 1;
+                      const count = employees.filter(emp => emp.gender === g && emp.role === 'EMPLOYEE').length + 1;
                       const formattedNum = count >= 10 ? `${count}` : `0${count}`;
                       setNewEmp({...newEmp, gender: g, employee_id: `${prefix}${formattedNum}`});
                     }}
@@ -593,13 +593,15 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   </select>
                 </div>
                 <div>
-                  <label className="block text-stone-700 font-bold mb-1">Employee ID (Auto-Generated)</label>
+                  <label className="block text-stone-700 font-bold mb-1">
+                    Employee ID <span className="text-emerald-600 font-semibold">(Auto-Generated Order)</span>
+                  </label>
                   <input
                     type="text"
-                    required
+                    readOnly
                     value={newEmp.employee_id}
-                    onChange={(e) => setNewEmp({...newEmp, employee_id: e.target.value})}
-                    className="w-full p-2.5 bg-stone-50 border border-stone-300 text-stone-900 font-mono font-bold rounded-xl"
+                    className="w-full p-2.5 bg-stone-100 border border-stone-300 text-rose-900 font-mono font-black rounded-xl cursor-not-allowed select-none shadow-inner"
+                    title="Employee ID is automatically assigned in sequential order upon creation"
                   />
                 </div>
               </div>
