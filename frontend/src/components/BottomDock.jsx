@@ -1,18 +1,28 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, UserCheck, CalendarDays, Receipt, Users, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, UserCheck, CalendarDays, Receipt, Users, Sun, Moon, User } from 'lucide-react';
 
 export const BottomDock = ({ activeTab, setActiveTab, darkMode, setDarkMode }) => {
   const { user } = useAuth();
   if (!user) return null;
 
-  const dockItems = [
-    { id: 'admin-dashboard', label: 'Admin', icon: LayoutDashboard },
+  const isAdmin = user?.role === 'ADMIN' || user?.is_superuser;
+
+  const adminDockItems = [
+    { id: 'admin-dashboard', label: 'Overview', icon: LayoutDashboard },
     { id: 'admin-employees', label: 'Directory', icon: Users },
     { id: 'admin-leaves', label: 'Leaves', icon: CalendarDays },
     { id: 'admin-payroll', label: 'Payslips', icon: Receipt },
-    { id: 'my-attendance', label: 'Attendance', icon: UserCheck },
   ];
+
+  const employeeDockItems = [
+    { id: 'dashboard', label: 'My Bio', icon: User },
+    { id: 'attendance', label: 'Attendance', icon: UserCheck },
+    { id: 'leaves', label: 'Leaves', icon: CalendarDays },
+    { id: 'payroll', label: 'Payslips', icon: Receipt },
+  ];
+
+  const dockItems = isAdmin ? adminDockItems : employeeDockItems;
 
   return (
     <div className="fixed bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 font-['Plus_Jakarta_Sans',sans-serif] px-2 max-w-full">

@@ -31,7 +31,7 @@ export const Login = ({ isModal = false, onClose, onLoginSuccess }) => {
         <div className="flex items-center justify-between border-b pb-3 border-stone-100">
           <div>
             <h3 className="text-lg font-black text-stone-900">Employee Portal Sign In</h3>
-            <p className="text-xs text-stone-500">Sign in to access Admin Dashboard.</p>
+            <p className="text-xs text-stone-500">Sign in to access your employee portal.</p>
           </div>
           {onClose && (
             <button onClick={onClose} className="p-1 text-stone-400 hover:text-stone-700 rounded-lg">
@@ -79,7 +79,7 @@ export const Login = ({ isModal = false, onClose, onLoginSuccess }) => {
             disabled={loading}
             className="w-full bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-3 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
           >
-            {loading ? 'Signing in...' : 'Sign In to Admin Dashboard'}
+            {loading ? 'Signing in...' : 'Sign In to Employee Portal'}
           </button>
         </form>
       </div>
@@ -98,26 +98,26 @@ export const Login = ({ isModal = false, onClose, onLoginSuccess }) => {
               </div>
               <div>
                 <h1 className="text-2xl font-black tracking-tight">Thahira Groups</h1>
-                <span className="text-[11px] font-semibold text-rose-200 tracking-wider uppercase">ERP System</span>
+                <span className="text-[11px] font-semibold text-rose-200 tracking-wider uppercase">Employee Portal</span>
               </div>
             </div>
 
-            <h2 className="text-xl font-bold mb-3">Employee Sign In</h2>
+            <h2 className="text-xl font-bold mb-3">Employee Portal Sign In</h2>
             <p className="text-rose-100 text-xs leading-relaxed">
-              Sign in with your assigned Employee ID and Mobile Number password to access the Admin Dashboard.
+              Sign in with your assigned Employee ID and Mobile Number password to access your attendance, leaves, and salary slips.
             </p>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-rose-200/80 pt-6 border-t border-white/10 mt-8">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Thahira Groups • Enterprise Admin System</span>
+            <span>Thahira Groups • Employee System</span>
           </div>
         </div>
 
         <div className="p-8 md:p-10 flex flex-col justify-between bg-white">
           <div>
             <div className="mb-6">
-              <h3 className="text-xl font-black text-stone-900">Sign In to Admin Dashboard</h3>
+              <h3 className="text-xl font-black text-stone-900">Employee Sign In</h3>
               <p className="text-xs text-stone-500 mt-1">Enter your Employee ID or Email below.</p>
             </div>
 
@@ -140,7 +140,7 @@ export const Login = ({ isModal = false, onClose, onLoginSuccess }) => {
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="e.g. THG-M-01 or email"
+                    placeholder="e.g. THG-M-01 or THG-F-01"
                     className="w-full bg-stone-50 border border-stone-300 rounded-xl pl-10 pr-4 py-2.5 text-sm text-stone-900 focus:outline-none focus:border-[#881337] font-mono"
                   />
                 </div>
@@ -166,14 +166,14 @@ export const Login = ({ isModal = false, onClose, onLoginSuccess }) => {
                 disabled={loading}
                 className="w-full bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg shadow-rose-950/20 flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
               >
-                {loading ? 'Signing in...' : 'Sign In to Admin Dashboard'}
+                {loading ? 'Signing in...' : 'Sign In to Employee Portal'}
               </button>
             </form>
           </div>
 
           <div className="mt-8 pt-4 border-t border-stone-100 text-center">
             <span className="text-[11px] text-stone-400">
-              Thahira Groups Security • Authorized Access Only
+              Thahira Groups • Authorized Employee Access Only
             </span>
           </div>
         </div>

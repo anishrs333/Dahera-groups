@@ -6,14 +6,21 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN' || user?.is_superuser;
 
-  const navItems = [
-    { id: 'admin-dashboard', label: 'Admin Dashboard', icon: LayoutDashboard },
+  const employeeNav = [
+    { id: 'dashboard', label: 'My Bio & Profile', icon: User },
+    { id: 'attendance', label: 'Check-In / Attendance', icon: UserCheck },
+    { id: 'leaves', label: 'Leave Applications', icon: CalendarDays },
+    { id: 'payroll', label: 'Salary Slips', icon: Receipt },
+  ];
+
+  const adminNav = [
+    { id: 'admin-dashboard', label: 'Overview', icon: LayoutDashboard },
     { id: 'admin-employees', label: 'Employee Directory', icon: Users },
     { id: 'admin-leaves', label: 'Leave Approvals', icon: CalendarDays },
     { id: 'admin-payroll', label: 'Payroll & Slips', icon: Receipt },
-    { id: 'my-portal', label: 'My Bio & Profile', icon: User },
-    { id: 'my-attendance', label: 'My Attendance', icon: UserCheck },
   ];
+
+  const navItems = isAdmin ? adminNav : employeeNav;
 
   const handleSelect = (id) => {
     setActiveTab(id);
@@ -27,8 +34,14 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, da
       <div>
         <div className="px-5 mb-5 flex items-center justify-between">
           <span className="text-[11px] font-extrabold text-rose-800 uppercase tracking-wider flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-rose-800 shrink-0" />
-            <span>Admin Control Panel</span>
+            {isAdmin ? (
+              <>
+                <Shield className="w-3.5 h-3.5 text-rose-800 shrink-0" />
+                <span>Admin Console</span>
+              </>
+            ) : (
+              <span>Employee Portal</span>
+            )}
           </span>
           <button
             onClick={() => setMobileOpen(false)}
