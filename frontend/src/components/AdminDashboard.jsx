@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Users, CalendarDays, Receipt, UserPlus, CheckCircle, XCircle, Clock, Search, ShieldCheck, DollarSign, Download, UserX, UserCheck, Calculator } from 'lucide-react';
+import { Users, CalendarDays, Receipt, UserPlus, CheckCircle, XCircle, Clock, Search, ShieldCheck, DollarSign, Download, UserX, UserCheck, Calculator, Filter, FileText } from 'lucide-react';
 
 export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false }) => {
   const [employees, setEmployees] = useState([]);
   const [leaves, setLeaves] = useState([]);
   const [slips, setSlips] = useState([]);
+  const [attendanceLogs, setAttendanceLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [downloadingId, setDownloadingId] = useState(null);
+  const [downloadingAttPdf, setDownloadingAttPdf] = useState(false);
+
+  // Attendance Filter State
+  const [attFilters, setAttFilters] = useState({
+    start_date: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0],
+    end_date: new Date().toISOString().split('T')[0],
+    status: 'ALL',
+    employee: 'ALL'
+  });
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [addMsg, setAddMsg] = useState('');
@@ -66,14 +76,24 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [empRes, leaveRes, slipRes] = await Promise.all([
+      const queryParams = new URLSearchParams({
+        start_date: attFilters.start_date,
+        end_date: attFilters.end_date,
+        status: attFilters.status,
+        employee: attFilters.employee
+      }).toString();
+
+      const [empRes, leaveRes, slipRes, attRes] = await Promise.all([
         api.get('/users/employees/'),
         api.get('/leaves/'),
-        api.get('/payroll/slips/')
+        api.get('/payroll/slips/'),
+        api.get(`/attendance/logs/?${queryParams}`)
       ]);
+
       setEmployees(empRes.data.results || empRes.data);
       setLeaves(leaveRes.data.results || leaveRes.data);
       setSlips(slipRes.data.results || slipRes.data);
+      setAttendanceLogs(attRes.data.results || attRes.data);
     } catch (err) {
       console.error("Fetch error:", err);
     } finally {
@@ -83,7 +103,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [attFilters]);
 
   const handleApproveLeave = async (id) => {
     try {
@@ -188,6 +208,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
     }
   };
 
+  // Payslip PDF Download (Mobile + Desktop)
   const handleDownloadPdf = async (slipId, monthName, year, employeeId) => {
     setDownloadingId(slipId);
     try {
@@ -218,11 +239,89 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
     }
   };
 
+  // Attendance PDF Report Download (Mobile + Desktop)
+  const handleDownloadAttendancePdf = async () => {
+    setDownloadingAttPdf(true);
+    try {
+      const queryParams = new URLSearchParams({
+        start_date: attFilters.start_date,
+        end_date: attFilters.end_date,
+        status: attFilters.status,
+        employee: attFilters.employee
+      }).toString();
+
+      const response = await api.get(`/attendance/logs/download_pdf/?${queryParams}`, {
+        responseType: 'blob'
+      });
+
+      if (response.data.type && response.data.type.includes('json')) {
+        const errorText = await response.data.text();
+        const json = JSON.parse(errorText);
+        alert(json.detail || "Error generating attendance PDF.");
+        return;
+      }
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Thahira_Attendance_Report_${attFilters.start_date}_to_${attFilters.end_date}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error("Attendance PDF error:", err);
+      alert("Failed to download attendance PDF report.");
+    } finally {
+      setDownloadingAttPdf(false);
+    }
+  };
+
   const totalEmployees = employees.length;
   const maleCount = employees.filter(e => e.gender === 'MALE').length;
   const femaleCount = employees.filter(e => e.gender === 'FEMALE').length;
   const pendingLeaves = leaves.filter(l => l.status === 'PENDING').length;
   const totalPayroll = slips.reduce((acc, curr) => acc + parseFloat(curr.net_salary || 0), 0);
+
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  // Map today's attendance for every employee (Present vs Absent vs On Leave)
+  const todayEmployeeAttendance = employees.map(emp => {
+    const todayAtt = attendanceLogs.find(a => a.employee === emp.id && a.date === todayStr);
+    const approvedLeave = leaves.find(l => l.employee === emp.id && l.status === 'APPROVED' && l.start_date <= todayStr && l.end_date >= todayStr);
+
+    let statusText = 'ABSENT';
+    let statusClass = 'bg-rose-100 text-rose-800 border-rose-200';
+
+    if (approvedLeave) {
+      statusText = 'ON LEAVE';
+      statusClass = 'bg-purple-100 text-purple-800 border-purple-200';
+    } else if (todayAtt) {
+      if (todayAtt.status === 'LATE') {
+        statusText = 'LATE';
+        statusClass = 'bg-amber-100 text-amber-800 border-amber-200';
+      } else {
+        statusText = 'PRESENT';
+        statusClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      }
+    }
+
+    return {
+      id: emp.id,
+      name: emp.full_name || emp.username,
+      employee_id: emp.employee_id || 'N/A',
+      gender: emp.gender,
+      shift_time: emp.scheduled_login_time,
+      check_in: todayAtt?.check_in ? new Date(todayAtt.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-',
+      check_out: todayAtt?.check_out ? new Date(todayAtt.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-',
+      status: statusText,
+      statusClass: statusClass
+    };
+  });
+
+  const presentCountToday = todayEmployeeAttendance.filter(a => a.status === 'PRESENT' || a.status === 'LATE').length;
+  const absentCountToday = todayEmployeeAttendance.filter(a => a.status === 'ABSENT').length;
 
   const filteredEmployees = employees.filter(e => 
     (e.full_name || e.username).toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -262,10 +361,10 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
             <span>Admin Console</span>
           </div>
           <h1 className="text-2xl font-black tracking-tight">Admin Dashboard</h1>
-          <p className="text-rose-100 text-xs mt-1">Manage staff accounts, approve leave requests, and issue monthly salary slips.</p>
+          <p className="text-rose-100 text-xs mt-1">Manage staff accounts, track daily present/absent status, and generate filtered PDF reports.</p>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={handleOpenAddModal}
             className="bg-white hover:bg-rose-50 text-[#881337] font-black px-4 py-2.5 rounded-xl text-xs transition-all shadow-lg flex items-center gap-2"
@@ -300,6 +399,19 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
 
         <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
           <div>
+            <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Today's Attendance</span>
+            <span className="text-2xl font-black text-emerald-600">{presentCountToday} / {totalEmployees}</span>
+            <span className={`text-xs block mt-1 ${textMuted}`}>
+              <strong className="text-emerald-700">{presentCountToday} Present</strong> • <strong className="text-rose-800">{absentCountToday} Absent</strong>
+            </span>
+          </div>
+          <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl">
+            <UserCheck className="w-6 h-6" />
+          </div>
+        </div>
+
+        <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
+          <div>
             <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Pending Leaves</span>
             <span className="text-2xl font-black text-amber-600">{pendingLeaves}</span>
             <span className={`text-xs block mt-1 ${textMuted}`}>Awaiting action</span>
@@ -319,16 +431,170 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
             <DollarSign className="w-6 h-6" />
           </div>
         </div>
+      </div>
 
-        <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
+      {/* Today's Staff Attendance Status Grid (Present vs Absent) */}
+      <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
           <div>
-            <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Shift Schedules</span>
-            <span className="text-xs font-bold block mt-1">Male: <strong className="text-rose-800">10:00 AM</strong></span>
-            <span className="text-xs font-bold block mt-0.5">Female: <strong className="text-amber-800">09:30 AM</strong></span>
+            <h2 className="text-lg font-bold">Today's Staff Attendance Status (Present / Absent)</h2>
+            <p className={`text-xs mt-0.5 ${textMuted}`}>Live shift attendance tracking for all employees.</p>
           </div>
-          <div className={`p-3 rounded-xl ${innerBg}`}>
-            <Clock className="w-6 h-6" />
+          <span className="text-xs font-bold px-3 py-1 bg-rose-50 text-rose-900 border border-rose-200 rounded-full w-fit">
+            {todayStr}
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className={`border-b text-[11px] font-bold uppercase ${darkMode ? 'border-stone-800 text-stone-400 bg-stone-950' : 'border-stone-200 text-stone-500 bg-stone-50'}`}>
+                <th className="py-3 px-4">Employee ID</th>
+                <th className="py-3 px-4">Employee Name</th>
+                <th className="py-3 px-4">Shift Schedule</th>
+                <th className="py-3 px-4">Check-In Time</th>
+                <th className="py-3 px-4">Check-Out Time</th>
+                <th className="py-3 px-4 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stone-100 text-xs">
+              {todayEmployeeAttendance.map((empAtt) => (
+                <tr key={empAtt.id} className="hover:bg-stone-50/80 transition-colors">
+                  <td className="py-3.5 px-4 font-black text-rose-800 font-mono">{empAtt.employee_id}</td>
+                  <td className="py-3.5 px-4 font-bold">{empAtt.name}</td>
+                  <td className="py-3.5 px-4">
+                    <span className="font-semibold text-rose-900">{empAtt.shift_time}</span>
+                  </td>
+                  <td className="py-3.5 px-4 font-mono">{empAtt.check_in}</td>
+                  <td className="py-3.5 px-4 font-mono">{empAtt.check_out}</td>
+                  <td className="py-3.5 px-4 text-right">
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold border ${empAtt.statusClass}`}>
+                      {empAtt.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Attendance Report Generator & Filter Controls (Download PDF Mobile + Desktop) */}
+      <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
+          <div>
+            <h2 className="text-lg font-bold">Attendance Filter & PDF Report Generator</h2>
+            <p className={`text-xs mt-0.5 ${textMuted}`}>Filter attendance logs by date range, status, or employee, and download official PDF reports.</p>
           </div>
+
+          <button
+            onClick={handleDownloadAttendancePdf}
+            disabled={downloadingAttPdf}
+            className="px-4 py-2.5 bg-[#881337] hover:bg-[#991B1B] text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
+          >
+            <Download className="w-4 h-4" />
+            <span>{downloadingAttPdf ? 'Generating PDF...' : 'Download Attendance PDF Report'}</span>
+          </button>
+        </div>
+
+        {/* Filter Controls Bar */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div>
+            <label className="block font-bold mb-1">Start Date</label>
+            <input
+              type="date"
+              value={attFilters.start_date}
+              onChange={(e) => setAttFilters({...attFilters, start_date: e.target.value})}
+              className={`w-full p-2.5 rounded-xl border ${innerBg}`}
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold mb-1">End Date</label>
+            <input
+              type="date"
+              value={attFilters.end_date}
+              onChange={(e) => setAttFilters({...attFilters, end_date: e.target.value})}
+              className={`w-full p-2.5 rounded-xl border ${innerBg}`}
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold mb-1">Status Filter</label>
+            <select
+              value={attFilters.status}
+              onChange={(e) => setAttFilters({...attFilters, status: e.target.value})}
+              className={`w-full p-2.5 rounded-xl border ${innerBg}`}
+            >
+              <option value="ALL">All Statuses</option>
+              <option value="ON_TIME">Present / On Time</option>
+              <option value="LATE">Late Arrivals</option>
+              <option value="ABSENT">Absences</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-bold mb-1">Employee Filter</label>
+            <select
+              value={attFilters.employee}
+              onChange={(e) => setAttFilters({...attFilters, employee: e.target.value})}
+              className={`w-full p-2.5 rounded-xl border ${innerBg}`}
+            >
+              <option value="ALL">All Employees</option>
+              {employees.map(emp => (
+                <option key={emp.id} value={emp.employee_id}>
+                  {emp.full_name} ({emp.employee_id})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Attendance Logs Table */}
+        <div className="overflow-x-auto pt-2">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className={`border-b text-[11px] font-bold uppercase ${darkMode ? 'border-stone-800 text-stone-400 bg-stone-950' : 'border-stone-200 text-stone-500 bg-stone-50'}`}>
+                <th className="py-3 px-4">Date</th>
+                <th className="py-3 px-4">Employee</th>
+                <th className="py-3 px-4">Shift Schedule</th>
+                <th className="py-3 px-4">Check In</th>
+                <th className="py-3 px-4">Check Out</th>
+                <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-4 text-right">Working Hours</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stone-100 text-xs">
+              {attendanceLogs.length === 0 ? (
+                <tr><td colSpan="7" className={`py-4 text-center ${textMuted}`}>No attendance records match the selected filter.</td></tr>
+              ) : (
+                attendanceLogs.map((log) => (
+                  <tr key={log.id} className="hover:bg-stone-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-semibold">{log.date}</td>
+                    <td className="py-3.5 px-4 font-bold">
+                      {log.employee_name}
+                      <span className="block text-[11px] font-mono text-rose-800">{log.employee_id}</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-rose-900 font-medium">{log.expected_login_time}</td>
+                    <td className="py-3.5 px-4 font-mono">
+                      {log.check_in ? new Date(log.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-'}
+                    </td>
+                    <td className="py-3.5 px-4 font-mono">
+                      {log.check_out ? new Date(log.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-'}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        log.status === 'LATE' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                      }`}>
+                        {log.status}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-medium">{log.working_hours} hrs</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 

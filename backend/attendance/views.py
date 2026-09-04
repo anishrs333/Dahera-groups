@@ -1,11 +1,16 @@
 from rest_framework import viewsets, status
+from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
+from django.http import HttpResponse
+from datetime import datetime
+
 from .models import Attendance
 from .serializers import AttendanceSerializer
-from users.permissions import IsSelfOrAdmin
+from .utils import generate_attendance_report_pdf
+from users.permissions import IsSelfOrAdmin, IsAdminUserRole
 
 class CheckInView(APIView):
     permission_classes = [IsAuthenticated]
@@ -85,6 +90,57 @@ class AttendanceViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_admin_role:
-            return Attendance.objects.all().select_related('employee').order_by('-date')
-        return Attendance.objects.filter(employee=user).order_by('-date')
+        qs = Attendance.objects.all().select_related('employee').order_by('-date', '-check_in') if user.is_admin_role else Attendance.objects.filter(employee=user).order_by('-date')
+        
+        # Query param filters
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        status_param = self.request.query_params.get('status')
+        emp_param = self.request.query_params.get('employee')
+
+        if start_date:
+            qs = qs.filter(date__gte=start_date)
+        if end_date:
+            qs = qs.filter(date__lte=end_date)
+        if status_param and status_param != 'ALL':
+            qs = qs.filter(status=status_param)
+        if emp_param and emp_param != 'ALL' and user.is_admin_role:
+            qs = qs.filter(employee__employee_id=emp_param)
+
+        return qs
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated, IsAdminUserRole])
+    def download_pdf(self, request):
+        qs = self.get_queryset()
+        
+        records = []
+        for att in qs:
+            records.append({
+                'date': str(att.date),
+                'employee_name': att.employee.get_full_name() or att.employee.username,
+                'employee_id': att.employee.employee_id or 'N/A',
+                'expected_login_time': att.expected_login_time or att.employee.get_scheduled_login_time(),
+                'check_in_formatted': att.check_in.strftime('%I:%M %p') if att.check_in else '-',
+                'check_out_formatted': att.check_out.strftime('%I:%M %p') if att.check_out else '-',
+                'status': att.status,
+                'working_hours': att.working_hours,
+            })
+
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        status_filter = request.query_params.get('status', 'ALL')
+        emp_filter = request.query_params.get('employee', 'ALL')
+
+        pdf_bytes = generate_attendance_report_pdf(
+            records=records,
+            start_date=start_date,
+            end_date=end_date,
+            status_filter=status_filter,
+            employee_filter=emp_filter
+        )
+
+        filename = f"Thahira_Attendance_Report_{start_date or 'All'}_to_{end_date or 'Today'}.pdf"
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response['Access-Control-Expose-Headers'] = 'Content-Disposition'
+        return response
