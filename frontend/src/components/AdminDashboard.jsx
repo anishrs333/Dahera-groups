@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Users, CalendarDays, Receipt, UserPlus, CheckCircle, XCircle, Clock, Search, ShieldCheck, DollarSign, Download, Sparkles } from 'lucide-react';
+import { Users, CalendarDays, Receipt, UserPlus, CheckCircle, XCircle, Clock, Search, ShieldCheck, DollarSign, Download, UserX, UserCheck } from 'lucide-react';
 
-export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
+export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false }) => {
   const [employees, setEmployees] = useState([]);
   const [leaves, setLeaves] = useState([]);
   const [slips, setSlips] = useState([]);
@@ -104,6 +104,27 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
     }
   };
 
+  const handleTerminateEmployee = async (id, empName) => {
+    if (!window.confirm(`Are you sure you want to terminate ${empName}? They will be immediately blocked from logging in.`)) {
+      return;
+    }
+    try {
+      await api.post(`/users/employees/${id}/terminate/`);
+      fetchData();
+    } catch (err) {
+      alert("Failed to terminate employee account.");
+    }
+  };
+
+  const handleReactivateEmployee = async (id, empName) => {
+    try {
+      await api.post(`/users/employees/${id}/reactivate/`);
+      fetchData();
+    } catch (err) {
+      alert("Failed to reactivate employee account.");
+    }
+  };
+
   const handleAddEmployeeSubmit = async (e) => {
     e.preventDefault();
     setAddMsg('');
@@ -166,12 +187,16 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
   if (loading) {
     return (
-      <div className="p-8 text-center text-stone-500 flex flex-col items-center justify-center min-h-[400px]">
+      <div className="p-8 text-center flex flex-col items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-4 border-rose-900 border-t-transparent rounded-full animate-spin mb-3"></div>
-        <span>Loading Thahira Groups Admin Console...</span>
+        <span className={darkMode ? 'text-stone-400' : 'text-stone-500'}>Loading Thahira Groups Admin Console...</span>
       </div>
     );
   }
+
+  const cardBg = darkMode ? 'bg-stone-900 border-stone-800 text-white' : 'bg-white border-stone-200 text-stone-900';
+  const innerBg = darkMode ? 'bg-stone-950 border-stone-800' : 'bg-stone-50 border-stone-200';
+  const textMuted = darkMode ? 'text-stone-400' : 'text-stone-500';
 
   return (
     <div className="space-y-6 font-['Plus_Jakarta_Sans',sans-serif]">
@@ -184,7 +209,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
             <span>Admin Executive Dashboard</span>
           </div>
           <h1 className="text-2xl font-black tracking-tight">Thahira Groups Executive Control Panel</h1>
-          <p className="text-rose-100 text-xs mt-1">Manage employee profiles, leave request approvals, and monthly salary slips.</p>
+          <p className="text-rose-100 text-xs mt-1">Manage employee profiles, termination status, leave request approvals, and monthly salary slips.</p>
         </div>
         
         <div className="flex items-center gap-3">
@@ -209,12 +234,12 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
       {/* Strategic Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+        <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
           <div>
-            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">Total Staff</span>
-            <span className="text-2xl font-black text-stone-900">{totalEmployees}</span>
-            <span className="text-xs text-stone-500 block mt-1">
-              <strong className="text-rose-900">{maleCount}</strong> Male (10 AM) • <strong className="text-amber-800">{femaleCount}</strong> Female (9:30 AM)
+            <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Total Staff</span>
+            <span className="text-2xl font-black">{totalEmployees}</span>
+            <span className={`text-xs block mt-1 ${textMuted}`}>
+              <strong className="text-rose-800">{maleCount}</strong> Male (10 AM) • <strong className="text-amber-800">{femaleCount}</strong> Female (9:30 AM)
             </span>
           </div>
           <div className="p-3 bg-rose-50 text-rose-900 rounded-xl">
@@ -222,35 +247,35 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+        <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
           <div>
-            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">Pending Leave Queue</span>
+            <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Pending Leave Queue</span>
             <span className="text-2xl font-black text-amber-600">{pendingLeaves}</span>
-            <span className="text-xs text-stone-500 block mt-1">Awaiting HR Approval</span>
+            <span className={`text-xs block mt-1 ${textMuted}`}>Awaiting HR Approval</span>
           </div>
           <div className="p-3 bg-amber-50 text-amber-700 rounded-xl">
             <CalendarDays className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+        <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
           <div>
-            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">Monthly Payroll</span>
-            <span className="text-2xl font-black text-emerald-700">₹{totalPayroll.toLocaleString('en-IN')}</span>
-            <span className="text-xs text-stone-500 block mt-1">Total Issued Payslips</span>
+            <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Monthly Payroll</span>
+            <span className="text-2xl font-black text-emerald-600">₹{totalPayroll.toLocaleString('en-IN')}</span>
+            <span className={`text-xs block mt-1 ${textMuted}`}>Total Issued Payslips</span>
           </div>
           <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl">
             <DollarSign className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+        <div className={`p-5 rounded-2xl border shadow-sm flex items-center justify-between ${cardBg}`}>
           <div>
-            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block">Shift Rules Active</span>
-            <span className="text-xs font-bold text-stone-800 block mt-1">Male: <strong className="text-rose-900">10:00 AM</strong></span>
-            <span className="text-xs font-bold text-stone-800 block mt-0.5">Female: <strong className="text-amber-800">9:30 AM</strong></span>
+            <span className={`text-[11px] font-bold uppercase tracking-wider block ${textMuted}`}>Shift Rules Active</span>
+            <span className="text-xs font-bold block mt-1">Male: <strong className="text-rose-800">10:00 AM</strong></span>
+            <span className="text-xs font-bold block mt-0.5">Female: <strong className="text-amber-800">9:30 AM</strong></span>
           </div>
-          <div className="p-3 bg-stone-100 text-stone-700 rounded-xl">
+          <div className={`p-3 rounded-xl ${innerBg}`}>
             <Clock className="w-6 h-6" />
           </div>
         </div>
@@ -259,11 +284,11 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
       {/* Leave Approval Queue */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-leaves') && (
-        <div className="bg-white rounded-3xl border border-stone-200 shadow-sm p-6 space-y-4">
+        <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
           <div className="flex items-center justify-between border-b border-stone-100 pb-4">
             <div>
-              <h2 className="text-lg font-bold text-stone-900">Leave Requests Approval Queue</h2>
-              <p className="text-xs text-stone-500 mt-0.5">Click Approve or Reject to process staff leave applications.</p>
+              <h2 className="text-lg font-bold">Leave Requests Approval Queue</h2>
+              <p className={`text-xs mt-0.5 ${textMuted}`}>Click Approve or Reject to process staff leave applications.</p>
             </div>
             <span className="px-3 py-1 bg-amber-50 text-amber-800 font-bold text-xs rounded-full border border-amber-200">
               {pendingLeaves} Pending Action
@@ -271,12 +296,12 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
           </div>
 
           {leaves.length === 0 ? (
-            <p className="text-sm text-stone-400 text-center py-6">No leave requests found.</p>
+            <p className={`text-sm text-center py-6 ${textMuted}`}>No leave requests found.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-stone-200 text-[11px] font-bold text-stone-500 uppercase bg-stone-50">
+                  <tr className={`border-b text-[11px] font-bold uppercase ${darkMode ? 'border-stone-800 text-stone-400 bg-stone-950' : 'border-stone-200 text-stone-500 bg-stone-50'}`}>
                     <th className="py-3 px-4">Employee</th>
                     <th className="py-3 px-4">Type</th>
                     <th className="py-3 px-4">Duration</th>
@@ -288,18 +313,18 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                 <tbody className="divide-y divide-stone-100 text-xs">
                   {leaves.map((l) => (
                     <tr key={l.id} className="hover:bg-stone-50/80 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-stone-900">
+                      <td className="py-3.5 px-4 font-bold">
                         {l.employee_details?.full_name || 'Employee'}
-                        <span className="block text-[11px] font-mono text-rose-900">{l.employee_details?.employee_id}</span>
+                        <span className="block text-[11px] font-mono text-rose-800">{l.employee_details?.employee_id}</span>
                       </td>
-                      <td className="py-3.5 px-4 font-semibold text-stone-700">
-                        <span className="px-2 py-0.5 bg-stone-100 border border-stone-200 rounded">{l.leave_type}</span>
+                      <td className="py-3.5 px-4 font-semibold">
+                        <span className={`px-2 py-0.5 rounded border ${innerBg}`}>{l.leave_type}</span>
                       </td>
-                      <td className="py-3.5 px-4 text-stone-600">
+                      <td className="py-3.5 px-4">
                         {l.start_date} to {l.end_date}
-                        <span className="block text-[10px] text-stone-400">({l.total_days} days)</span>
+                        <span className={`block text-[10px] ${textMuted}`}>({l.total_days} days)</span>
                       </td>
-                      <td className="py-3.5 px-4 text-stone-600 max-w-xs truncate">{l.reason}</td>
+                      <td className="py-3.5 px-4 max-w-xs truncate">{l.reason}</td>
                       <td className="py-3.5 px-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                           l.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' :
@@ -328,7 +353,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[11px] text-stone-400 font-medium">Action Recorded</span>
+                          <span className={`text-[11px] font-medium ${textMuted}`}>Action Recorded</span>
                         )}
                       </td>
                     </tr>
@@ -340,13 +365,13 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
         </div>
       )}
 
-      {/* Staff Directory */}
+      {/* Staff Directory with Termination Controls */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-employees') && (
-        <div className="bg-white rounded-3xl border border-stone-200 shadow-sm p-6 space-y-4">
+        <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
             <div>
-              <h2 className="text-lg font-bold text-stone-900">Thahira Employee Directory</h2>
-              <p className="text-xs text-stone-500 mt-0.5">Active staff listing with assigned Employee IDs and Shift Times.</p>
+              <h2 className="text-lg font-bold">Thahira Employee Directory</h2>
+              <p className={`text-xs mt-0.5 ${textMuted}`}>Manage staff profiles, initial mobile password, and termination status.</p>
             </div>
             
             <div className="relative">
@@ -356,7 +381,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                 placeholder="Search staff, ID or dept..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 w-64 focus:outline-none focus:border-[#881337]"
+                className={`pl-9 pr-4 py-2 rounded-xl text-xs w-64 focus:outline-none focus:border-[#881337] border ${innerBg}`}
               />
             </div>
           </div>
@@ -364,47 +389,68 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-stone-200 text-[11px] font-bold text-stone-500 uppercase bg-stone-50">
+                <tr className={`border-b text-[11px] font-bold uppercase ${darkMode ? 'border-stone-800 text-stone-400 bg-stone-950' : 'border-stone-200 text-stone-500 bg-stone-50'}`}>
                   <th className="py-3 px-4">Employee ID</th>
-                  <th className="py-3 px-4">Full Name & Email</th>
+                  <th className="py-3 px-4">Full Name & Contact</th>
                   <th className="py-3 px-4">Gender & Shift Time</th>
                   <th className="py-3 px-4">Designation & Department</th>
-                  <th className="py-3 px-4">Base Salary</th>
-                  <th className="py-3 px-4">Role</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4 text-right">Termination Controls</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100 text-xs">
-                {filteredEmployees.map((emp) => (
-                  <tr key={emp.id} className="hover:bg-stone-50/80 transition-colors">
-                    <td className="py-3.5 px-4 font-black text-rose-900 font-mono">{emp.employee_id || 'N/A'}</td>
-                    <td className="py-3.5 px-4">
-                      <span className="font-bold text-stone-900 block">{emp.full_name}</span>
-                      <span className="text-[11px] text-stone-500">{emp.email}</span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
-                        emp.gender === 'FEMALE' ? 'bg-amber-50 text-amber-900 border border-amber-200' : 'bg-rose-50 text-rose-900 border border-rose-200'
-                      }`}>
-                        <Clock className="w-3 h-3" />
-                        {emp.gender} • {emp.scheduled_login_time}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-stone-700">
-                      <span className="font-semibold text-stone-800 block">{emp.designation}</span>
-                      <span className="text-[11px] text-stone-500">{emp.department}</span>
-                    </td>
-                    <td className="py-3.5 px-4 font-bold text-stone-800">
-                      ₹{parseFloat(emp.base_salary || 0).toLocaleString('en-IN')}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
-                        emp.role === 'ADMIN' ? 'bg-rose-100 text-rose-950' : 'bg-stone-100 text-stone-700'
-                      }`}>
-                        {emp.role}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {filteredEmployees.map((emp) => {
+                  const isTerminated = !emp.is_active || emp.status === 'TERMINATED';
+                  return (
+                    <tr key={emp.id} className="hover:bg-stone-50/80 transition-colors">
+                      <td className="py-3.5 px-4 font-black text-rose-800 font-mono">{emp.employee_id || 'N/A'}</td>
+                      <td className="py-3.5 px-4">
+                        <span className="font-bold block">{emp.full_name}</span>
+                        <span className={`text-[11px] block ${textMuted}`}>{emp.email} • Mobile: <strong className="font-mono">{emp.phone || 'N/A'}</strong></span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                          emp.gender === 'FEMALE' ? 'bg-amber-50 text-amber-900 border border-amber-200' : 'bg-rose-50 text-rose-900 border border-rose-200'
+                        }`}>
+                          <Clock className="w-3 h-3" />
+                          {emp.gender} • {emp.scheduled_login_time}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="font-semibold block">{emp.designation}</span>
+                        <span className={`text-[11px] ${textMuted}`}>{emp.department}</span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                          isTerminated ? 'bg-rose-100 text-rose-900 border-rose-300' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        }`}>
+                          {isTerminated ? 'TERMINATED' : 'ACTIVE'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        {emp.role !== 'ADMIN' && (
+                          isTerminated ? (
+                            <button
+                              onClick={() => handleReactivateEmployee(emp.id, emp.full_name)}
+                              className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-[11px] flex items-center gap-1.5 transition-colors shadow-xs ml-auto"
+                            >
+                              <UserCheck className="w-3.5 h-3.5" />
+                              <span>Reactivate</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleTerminateEmployee(emp.id, emp.full_name)}
+                              className="px-3 py-1 bg-rose-800 hover:bg-rose-700 text-white rounded-xl font-bold text-[11px] flex items-center gap-1.5 transition-colors shadow-xs ml-auto"
+                            >
+                              <UserX className="w-3.5 h-3.5" />
+                              <span>Terminate</span>
+                            </button>
+                          )
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -413,11 +459,11 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
       {/* Salary Slips Log */}
       {(subTab === 'admin-dashboard' || subTab === 'admin-payroll') && (
-        <div className="bg-white rounded-3xl border border-stone-200 shadow-sm p-6 space-y-4">
+        <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
           <div className="flex items-center justify-between border-b border-stone-100 pb-4">
             <div>
-              <h2 className="text-lg font-bold text-stone-900">Issued Salary Slips</h2>
-              <p className="text-xs text-stone-500 mt-0.5">Complete record of monthly payroll statements.</p>
+              <h2 className="text-lg font-bold">Issued Salary Slips</h2>
+              <p className={`text-xs mt-0.5 ${textMuted}`}>Complete record of monthly payroll statements.</p>
             </div>
             <button
               onClick={() => setShowSlipModal(true)}
@@ -431,7 +477,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-stone-200 text-[11px] font-bold text-stone-500 uppercase bg-stone-50">
+                <tr className={`border-b text-[11px] font-bold uppercase ${darkMode ? 'border-stone-800 text-stone-400 bg-stone-950' : 'border-stone-200 text-stone-500 bg-stone-50'}`}>
                   <th className="py-3 px-4">Employee</th>
                   <th className="py-3 px-4">Shift Schedule</th>
                   <th className="py-3 px-4">Pay Period</th>
@@ -444,18 +490,18 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
               <tbody className="divide-y divide-stone-100 text-xs">
                 {slips.map((slip) => (
                   <tr key={slip.id} className="hover:bg-stone-50/80 transition-colors">
-                    <td className="py-3.5 px-4 font-bold text-stone-900">
+                    <td className="py-3.5 px-4 font-bold">
                       {slip.employee_details?.full_name}
-                      <span className="block text-[11px] font-mono text-rose-900">{slip.employee_details?.employee_id}</span>
+                      <span className="block text-[11px] font-mono text-rose-800">{slip.employee_details?.employee_id}</span>
                     </td>
-                    <td className="py-3.5 px-4 font-bold text-stone-700">
+                    <td className="py-3.5 px-4 font-bold">
                       {slip.scheduled_login_time}
                     </td>
-                    <td className="py-3.5 px-4 text-stone-700 font-semibold">
+                    <td className="py-3.5 px-4 font-semibold">
                       {slip.month_name} {slip.year}
                     </td>
-                    <td className="py-3.5 px-4 text-stone-700">₹{parseFloat(slip.basic_salary).toLocaleString('en-IN')}</td>
-                    <td className="py-3.5 px-4 font-black text-emerald-700">₹{parseFloat(slip.net_salary).toLocaleString('en-IN')}</td>
+                    <td className="py-3.5 px-4">₹{parseFloat(slip.basic_salary).toLocaleString('en-IN')}</td>
+                    <td className="py-3.5 px-4 font-black text-emerald-600">₹{parseFloat(slip.net_salary).toLocaleString('en-IN')}</td>
                     <td className="py-3.5 px-4">
                       <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold rounded-full">
                         {slip.status}
@@ -540,7 +586,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                       const formattedNum = count >= 10 ? `${count}` : `0${count}`;
                       setNewEmp({...newEmp, gender: g, employee_id: `${prefix}${formattedNum}`});
                     }}
-                    className="w-full p-2.5 bg-stone-50 border border-stone-300 text-rose-900 font-bold rounded-xl"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 text-rose-800 font-bold rounded-xl"
                   >
                     <option value="MALE">MALE (Shift: 10:00 AM)</option>
                     <option value="FEMALE">FEMALE (Shift: 9:30 AM)</option>
@@ -561,7 +607,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-stone-700 font-bold mb-1">
-                    Mobile Number <span className="text-rose-900 font-semibold">(Initial Password)</span>
+                    Mobile Number <span className="text-rose-800 font-semibold">(Initial Password)</span>
                   </label>
                   <input
                     type="text"

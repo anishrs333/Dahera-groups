@@ -11,6 +11,11 @@ class User(AbstractUser):
         ADMIN = 'ADMIN', 'Admin'
         EMPLOYEE = 'EMPLOYEE', 'Employee'
 
+    class Status(models.TextChoices):
+        ACTIVE = 'ACTIVE', 'Active'
+        TERMINATED = 'TERMINATED', 'Terminated'
+        ON_LEAVE = 'ON_LEAVE', 'On Leave'
+
     gender = models.CharField(
         max_length=10,
         choices=Gender.choices,
@@ -22,6 +27,12 @@ class User(AbstractUser):
         choices=Role.choices,
         default=Role.EMPLOYEE,
         help_text="User System Role"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.ACTIVE,
+        help_text="Employment Status"
     )
     employee_id = models.CharField(
         max_length=20,
@@ -60,4 +71,4 @@ class User(AbstractUser):
         return self.role == self.Role.ADMIN or self.is_superuser
 
     def __str__(self):
-        return f"{self.get_full_name() or self.username} ({self.employee_id or 'No ID'}) - {self.role}"
+        return f"{self.get_full_name() or self.username} ({self.employee_id or 'No ID'}) - {self.role} [{self.status}]"

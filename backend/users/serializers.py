@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 'full_name',
-            'gender', 'role', 'employee_id', 'designation', 'department',
+            'gender', 'role', 'status', 'employee_id', 'designation', 'department',
             'phone', 'date_of_joining', 'bio', 'base_salary', 'scheduled_login_time',
             'is_active'
         ]
@@ -32,7 +32,7 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 'password',
-            'gender', 'role', 'employee_id', 'designation', 'department',
+            'gender', 'role', 'status', 'employee_id', 'designation', 'department',
             'phone', 'date_of_joining', 'bio', 'base_salary'
         ]
 
@@ -40,7 +40,7 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         provided_password = validated_data.pop('password', None)
         phone_number = validated_data.get('phone', '').strip()
         
-        # Initial Password = Employee Mobile Number
+        # Initial Password = Mobile Number
         initial_password = provided_password or phone_number or '9876543210'
 
         # Auto-generate employee_id if missing: THG-M-01 or THG-F-01
@@ -64,10 +64,15 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
     JWT Serializer for Thahira Groups:
-    Authenticate via Email, Username, or Employee ID (THG-M-01 / THG-F-01).
+    Authenticates via Email, Username, or Employee ID (THG-M-01 / THG-F-01).
+    Denies login if account is TERMINATED or INACTIVE.
     """
     def validate(self, attrs):
         login_input = attrs.get('username', '').strip()
@@ -79,9 +84,20 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             ).first()
             
             if user_obj:
+                if not user_obj.is_active or user_obj.status == 'TERMINATED':
+                    raise serializers.ValidationError({
+                        'detail': 'Access Denied. Your employment account with Thahira Groups has been terminated.'
+                    })
                 attrs['username'] = user_obj.username
 
         data = super().validate(attrs)
+        
+        # Double check authenticated user active state
+        if not self.user.is_active or self.user.status == 'TERMINATED':
+            raise serializers.ValidationError({
+                'detail': 'Access Denied. Your employment account with Thahira Groups has been terminated.'
+            })
+
         data['user'] = UserSerializer(self.user).data
         return data
 
@@ -93,4 +109,5 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['scheduled_login_time'] = user.get_scheduled_login_time()
         token['name'] = user.get_full_name() or user.username
         token['employee_id'] = user.employee_id or ""
+        token['status'] = user.status
         return token

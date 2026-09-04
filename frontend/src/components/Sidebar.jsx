@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LayoutDashboard, UserCheck, CalendarDays, Receipt, Users, X, Shield } from 'lucide-react';
 
-export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) => {
+export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, darkMode }) => {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN' || user?.is_superuser;
 
@@ -29,13 +29,15 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
   };
 
   const navContent = (
-    <div className="flex flex-col h-full justify-between py-5 bg-white border-r border-stone-200">
+    <div className={`flex flex-col h-full justify-between py-5 border-r rounded-3xl transition-colors duration-300 ${
+      darkMode ? 'bg-stone-900 border-stone-800 text-white' : 'bg-white border-stone-200 text-stone-900'
+    }`}>
       <div>
         <div className="px-5 mb-5 flex items-center justify-between">
-          <span className="text-[11px] font-extrabold text-rose-900 uppercase tracking-wider flex items-center gap-1.5">
+          <span className="text-[11px] font-extrabold text-rose-800 uppercase tracking-wider flex items-center gap-1.5">
             {isAdmin ? (
               <>
-                <Shield className="w-3.5 h-3.5 text-rose-900" />
+                <Shield className="w-3.5 h-3.5 text-rose-800" />
                 <span>Admin Command Center</span>
               </>
             ) : (
@@ -58,10 +60,12 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
               <button
                 key={item.id}
                 onClick={() => handleSelect(item.id)}
-                className={`w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-bold transition-all ${
+                className={`w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-xs font-bold transition-all ${
                   isActive
                     ? 'bg-[#881337] text-white shadow-md shadow-rose-950/20'
-                    : 'text-stone-600 hover:bg-stone-100/80 hover:text-stone-900'
+                    : darkMode
+                      ? 'text-stone-400 hover:bg-stone-800 hover:text-white'
+                      : 'text-stone-600 hover:bg-stone-100/80 hover:text-stone-900'
                 }`}
               >
                 <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-stone-400'}`} />
@@ -72,8 +76,8 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
         </nav>
       </div>
 
-      <div className="px-5 pt-4 border-t border-stone-100 text-xs text-stone-400">
-        <p className="font-bold text-stone-800">Thahira Groups ERP v1.0</p>
+      <div className={`px-5 pt-4 border-t text-xs ${darkMode ? 'border-stone-800 text-stone-500' : 'border-stone-100 text-stone-400'}`}>
+        <p className={`font-bold ${darkMode ? 'text-stone-300' : 'text-stone-800'}`}>Thahira Groups ERP v1.0</p>
         <p className="text-[11px]">User-Friendly Enterprise Suite</p>
       </div>
     </div>
@@ -82,7 +86,7 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:block w-64 min-h-[calc(100vh-4rem)] shrink-0">
+      <aside className="hidden md:block w-64 min-h-[calc(100vh-6rem)] shrink-0">
         {navContent}
       </aside>
 
@@ -96,7 +100,7 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
 
       {/* Mobile Drawer Panel */}
       <div
-        className={`fixed top-0 left-0 bottom-0 w-64 bg-white z-50 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl ${
+        className={`fixed top-0 left-0 bottom-0 w-64 z-50 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
