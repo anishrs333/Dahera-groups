@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { Clock, UserCheck, CalendarDays, Receipt, Download, Send, Lock, KeyRound, CheckCircle } from 'lucide-react';
+import { Clock, UserCheck, CalendarDays, Receipt, Download, Send, Lock, KeyRound, CheckCircle, AlertCircle } from 'lucide-react';
 
 export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) => {
   const { user } = useAuth();
@@ -17,7 +17,9 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
     end_date: '',
     reason: ''
   });
-  const [leaveMsg, setLeaveMsg] = useState('');
+  const [leaveSuccessMsg, setLeaveSuccessMsg] = useState('');
+  const [leaveErrorMsg, setLeaveErrorMsg] = useState('');
+  const [leaveSubmitting, setLeaveSubmitting] = useState(false);
 
   const [salarySlips, setSalarySlips] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,14 +79,30 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
 
   const handleLeaveSubmit = async (e) => {
     e.preventDefault();
-    setLeaveMsg('');
+    setLeaveSuccessMsg('');
+    setLeaveErrorMsg('');
+    setLeaveSubmitting(true);
     try {
       await api.post('/leaves/', leaveForm);
       setLeaveForm({ leave_type: 'CASUAL', start_date: '', end_date: '', reason: '' });
-      setLeaveMsg('Leave application submitted successfully.');
+      setLeaveSuccessMsg('Leave application submitted successfully! Sent to Admin for approval.');
       fetchData();
     } catch (err) {
-      setLeaveMsg(err.response?.data?.detail || 'Error submitting leave request.');
+      let errMsg = 'Error submitting leave request.';
+      if (err.response?.data) {
+        if (typeof err.response.data === 'string') {
+          errMsg = err.response.data;
+        } else if (err.response.data.detail) {
+          errMsg = err.response.data.detail;
+        } else {
+          errMsg = Object.entries(err.response.data)
+            .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+            .join(' | ');
+        }
+      }
+      setLeaveErrorMsg(errMsg);
+    } finally {
+      setLeaveSubmitting(false);
     }
   };
 
@@ -155,17 +173,17 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
 
       {(subTab === 'dashboard' || subTab === 'all') && (
         <div className={`rounded-3xl border shadow-sm overflow-hidden ${cardBg}`}>
-          <div className="p-6 md:p-8 bg-gradient-to-r from-[#4C0519] via-[#881337] to-[#991B1B] text-white">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="p-5 sm:p-8 bg-gradient-to-r from-[#4C0519] via-[#881337] to-[#991B1B] text-white">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur border border-white/20 text-white flex items-center justify-center font-black text-2xl shadow-lg">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 backdrop-blur border border-white/20 text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-lg shrink-0">
                   {user?.full_name?.charAt(0) || 'T'}
                 </div>
                 <div>
-                  <div className="flex items-center gap-2.5">
-                    <h1 className="text-2xl font-black text-white">{user?.full_name || user?.username}</h1>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-white/10 border border-white/20 text-rose-200">
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-xl sm:text-2xl font-black text-white leading-tight">{user?.full_name || user?.username}</h1>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-white/10 border border-white/20 text-rose-200">
                       {user?.gender}
                     </span>
                   </div>
@@ -175,13 +193,13 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                 </div>
               </div>
 
-              <div className="bg-black/20 backdrop-blur border border-white/20 p-4 rounded-2xl flex items-center gap-4">
-                <div className="p-3 bg-white/10 rounded-xl text-rose-200">
-                  <Clock className="w-7 h-7" />
+              <div className="bg-black/20 backdrop-blur border border-white/20 p-3.5 sm:p-4 rounded-2xl flex items-center gap-3.5">
+                <div className="p-2.5 bg-white/10 rounded-xl text-rose-200 shrink-0">
+                  <Clock className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <div>
                   <span className="text-[10px] font-bold tracking-wider uppercase text-rose-200 block">Shift Schedule</span>
-                  <span className="text-2xl font-black text-white tracking-tight">
+                  <span className="text-xl sm:text-2xl font-black text-white tracking-tight">
                     {scheduledTime}
                   </span>
                   <span className="text-[10px] text-rose-200 font-semibold block">
@@ -193,17 +211,17 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
             </div>
           </div>
 
-          <div className={`p-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs border-t ${darkMode ? 'bg-stone-950 border-stone-800' : 'bg-stone-50/60 border-stone-100'}`}>
-            <div className={`p-4 rounded-2xl border ${cardBg}`}>
-              <span className={`${textMuted} font-bold uppercase block mb-1`}>Email Address</span>
-              <span className="font-bold text-sm">{user?.email}</span>
+          <div className={`p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs border-t ${darkMode ? 'bg-stone-950 border-stone-800' : 'bg-stone-50/60 border-stone-100'}`}>
+            <div className={`p-3.5 rounded-2xl border ${cardBg}`}>
+              <span className={`${textMuted} font-bold uppercase block mb-0.5`}>Email Address</span>
+              <span className="font-bold text-xs sm:text-sm truncate block">{user?.email}</span>
             </div>
-            <div className={`p-4 rounded-2xl border ${cardBg}`}>
-              <span className={`${textMuted} font-bold uppercase block mb-1`}>Date of Joining</span>
-              <span className="font-bold text-sm">{user?.date_of_joining || 'Jan 15, 2023'}</span>
+            <div className={`p-3.5 rounded-2xl border ${cardBg}`}>
+              <span className={`${textMuted} font-bold uppercase block mb-0.5`}>Date of Joining</span>
+              <span className="font-bold text-xs sm:text-sm block">{user?.date_of_joining || 'Jan 15, 2023'}</span>
             </div>
-            <div className={`p-4 rounded-2xl border ${cardBg}`}>
-              <span className={`${textMuted} font-bold uppercase block mb-1`}>Bio Notes</span>
+            <div className={`p-3.5 rounded-2xl border ${cardBg}`}>
+              <span className={`${textMuted} font-bold uppercase block mb-0.5`}>Bio Notes</span>
               <span className="font-medium leading-relaxed block">{user?.bio || 'Staff Member'}</span>
             </div>
           </div>
@@ -211,7 +229,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
       )}
 
       {(subTab === 'dashboard' || subTab === 'all') && (
-        <div className={`p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
+        <div className={`p-5 sm:p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
           <div className="flex items-center gap-2 border-b pb-3 border-stone-200">
             <KeyRound className="w-5 h-5 text-rose-800" />
             <div>
@@ -222,18 +240,19 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
 
           {passMsg && (
             <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl font-bold flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-emerald-600" />
+              <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{passMsg}</span>
             </div>
           )}
 
           {passError && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl font-bold">
-              {passError}
+            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl font-bold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
+              <span>{passError}</span>
             </div>
           )}
 
-          <form onSubmit={handleChangePasswordSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <form onSubmit={handleChangePasswordSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             <div>
               <label className="block font-bold mb-1">Current Password</label>
               <input
@@ -260,7 +279,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
               <button
                 type="submit"
                 disabled={passLoading}
-                className="w-full bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 min-h-[42px]"
               >
                 <Lock className="w-4 h-4" />
                 <span>{passLoading ? 'Updating...' : 'Update Password'}</span>
@@ -271,8 +290,8 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
       )}
 
       {(subTab === 'dashboard' || subTab === 'attendance') && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className={`p-6 rounded-3xl border shadow-sm flex flex-col justify-between space-y-4 ${cardBg}`}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className={`p-5 sm:p-6 rounded-3xl border shadow-sm flex flex-col justify-between space-y-4 ${cardBg}`}>
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className={`text-xs font-bold uppercase tracking-wider ${textMuted}`}>Daily Check-In</span>
@@ -283,7 +302,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
               
               <div className="text-center py-5 bg-[#881337] text-white rounded-2xl my-2 shadow-lg shadow-rose-950/20">
                 <span className="text-xs text-rose-200 font-bold tracking-wider uppercase block">Current Time</span>
-                <span className="text-3xl font-black font-mono text-white tracking-tight">{clockTime}</span>
+                <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">{clockTime}</span>
                 <span className="text-[11px] text-rose-100 block mt-1">Shift Schedule: <strong className="text-white">{scheduledTime}</strong></span>
               </div>
 
@@ -291,14 +310,14 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                 <div className="space-y-2 text-xs pt-2">
                   <div className={`flex justify-between p-2.5 rounded-xl border ${innerBg}`}>
                     <span className={textMuted}>Check-in:</span>
-                    <span className="font-bold">
-                      {todayAttendance.check_in ? new Date(todayAttendance.check_in).toLocaleTimeString() : 'Not Checked In'}
+                    <span className="font-bold font-mono">
+                      {todayAttendance.check_in ? new Date(todayAttendance.check_in).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Not Checked In'}
                     </span>
                   </div>
                   <div className={`flex justify-between p-2.5 rounded-xl border ${innerBg}`}>
                     <span className={textMuted}>Check-out:</span>
-                    <span className="font-bold">
-                      {todayAttendance.check_out ? new Date(todayAttendance.check_out).toLocaleTimeString() : 'Pending'}
+                    <span className="font-bold font-mono">
+                      {todayAttendance.check_out ? new Date(todayAttendance.check_out).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Pending'}
                     </span>
                   </div>
                   <div className={`flex justify-between p-2.5 rounded-xl border ${innerBg}`}>
@@ -315,11 +334,11 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="grid grid-cols-2 gap-2.5 pt-2">
               <button
                 onClick={handleCheckIn}
                 disabled={todayAttendance?.check_in}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-30 text-white font-bold py-3 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-1.5"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-30 text-white font-bold py-3 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-1.5 min-h-[44px]"
               >
                 <UserCheck className="w-4 h-4" />
                 <span>Check In</span>
@@ -328,7 +347,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
               <button
                 onClick={handleCheckOut}
                 disabled={!todayAttendance?.check_in || todayAttendance?.check_out}
-                className="w-full bg-stone-800 hover:bg-stone-700 disabled:opacity-30 text-white font-bold py-3 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-1.5"
+                className="w-full bg-stone-800 hover:bg-stone-700 disabled:opacity-30 text-white font-bold py-3 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-1.5 min-h-[44px]"
               >
                 <Clock className="w-4 h-4" />
                 <span>Check Out</span>
@@ -336,11 +355,11 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
             </div>
           </div>
 
-          <div className={`md:col-span-2 p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
+          <div className={`lg:col-span-2 p-5 sm:p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
             <h2 className="text-base font-bold border-b border-stone-100 pb-3">Attendance History</h2>
             
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left border-collapse min-w-[500px]">
                 <thead>
                   <tr className={`border-b text-[11px] font-bold uppercase ${darkMode ? 'border-stone-800 text-stone-400 bg-stone-950' : 'border-stone-200 text-stone-500 bg-stone-50'}`}>
                     <th className="py-3 px-3">Date</th>
@@ -359,10 +378,10 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                       <tr key={log.id} className="hover:bg-stone-50/80 transition-colors">
                         <td className="py-3 px-3 font-semibold">{log.date}</td>
                         <td className="py-3 px-3 font-bold text-rose-900">{log.expected_login_time}</td>
-                        <td className="py-3 px-3">
+                        <td className="py-3 px-3 font-mono">
                           {log.check_in ? new Date(log.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-'}
                         </td>
-                        <td className="py-3 px-3">
+                        <td className="py-3 px-3 font-mono">
                           {log.check_out ? new Date(log.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-'}
                         </td>
                         <td className="py-3 px-3">
@@ -385,15 +404,23 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
 
       {(subTab === 'dashboard' || subTab === 'leaves') && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className={`p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
+          <div className={`p-5 sm:p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
             <div>
               <h2 className="text-base font-bold">Apply for Leave</h2>
               <p className={`text-xs mt-0.5 ${textMuted}`}>Submit leave application for approval.</p>
             </div>
 
-            {leaveMsg && (
-              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-900 text-xs rounded-xl font-medium">
-                {leaveMsg}
+            {leaveSuccessMsg && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl font-bold flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{leaveSuccessMsg}</span>
+              </div>
+            )}
+
+            {leaveErrorMsg && (
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl font-bold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
+                <span>{leaveErrorMsg}</span>
               </div>
             )}
 
@@ -412,7 +439,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label className="block font-bold mb-1">Start Date</label>
                   <input
@@ -449,19 +476,20 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
 
               <button
                 type="submit"
-                className="w-full bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-3 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                disabled={leaveSubmitting}
+                className="w-full bg-[#881337] hover:bg-[#991B1B] text-white font-bold py-3 rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 min-h-[44px]"
               >
                 <Send className="w-4 h-4" />
-                <span>Submit Request</span>
+                <span>{leaveSubmitting ? 'Submitting...' : 'Submit Request'}</span>
               </button>
             </form>
           </div>
 
-          <div className={`lg:col-span-2 p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
+          <div className={`lg:col-span-2 p-5 sm:p-6 rounded-3xl border shadow-sm space-y-4 ${cardBg}`}>
             <h2 className="text-base font-bold border-b border-stone-100 pb-3">My Leave Requests</h2>
             
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left border-collapse min-w-[550px]">
                 <thead>
                   <tr className={`border-b text-[11px] font-bold uppercase ${darkMode ? 'border-stone-800 text-stone-400 bg-stone-950' : 'border-stone-200 text-stone-500 bg-stone-50'}`}>
                     <th className="py-3 px-3">Type</th>
@@ -504,7 +532,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
       )}
 
       {(subTab === 'dashboard' || subTab === 'payroll') && (
-        <div className={`rounded-3xl border shadow-sm p-6 space-y-4 ${cardBg}`}>
+        <div className={`rounded-3xl border shadow-sm p-5 sm:p-6 space-y-4 ${cardBg}`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
             <div>
               <h2 className="text-lg font-bold">My Salary Slips</h2>
@@ -517,7 +545,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {salarySlips.map((slip) => (
-                <div key={slip.id} className={`p-5 rounded-2xl border space-y-3 ${innerBg}`}>
+                <div key={slip.id} className={`p-4 sm:p-5 rounded-2xl border space-y-3 ${innerBg}`}>
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-base font-bold block">{slip.month_name} {slip.year} Payslip</span>
@@ -564,7 +592,7 @@ export const EmployeeDashboard = ({ subTab = 'dashboard', darkMode = false }) =>
                       type="button"
                       disabled={downloadingId === slip.id}
                       onClick={() => handleDownloadPdf(slip.id, slip.month_name, slip.year, user?.employee_id)}
-                      className="px-4 py-2 bg-[#881337] hover:bg-[#991B1B] text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
+                      className="px-4 py-2 bg-[#881337] hover:bg-[#991B1B] text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 disabled:opacity-50 min-h-[38px]"
                     >
                       <Download className="w-4 h-4" />
                       <span>{downloadingId === slip.id ? 'Downloading...' : 'Download PDF'}</span>

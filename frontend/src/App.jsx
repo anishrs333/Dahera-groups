@@ -33,6 +33,21 @@ const MainLayout = () => {
     }
   }, [darkMode]);
 
+  const handleSelectTab = (targetTab) => {
+    if (!targetTab) return;
+    if (isAdmin) {
+      if (targetTab === 'leaves') setActiveTab('admin-leaves');
+      else if (targetTab === 'payroll') setActiveTab('admin-payroll');
+      else if (targetTab === 'attendance') setActiveTab('admin-dashboard');
+      else setActiveTab(targetTab);
+    } else {
+      if (targetTab === 'admin-leaves') setActiveTab('leaves');
+      else if (targetTab === 'admin-payroll') setActiveTab('payroll');
+      else if (targetTab === 'admin-dashboard' || targetTab === 'admin-employees') setActiveTab('dashboard');
+      else setActiveTab(targetTab);
+    }
+  };
+
   if (loading) {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center font-['Plus_Jakarta_Sans',sans-serif] ${darkMode ? 'bg-stone-950 text-white' : 'bg-[#FAF9F6] text-stone-900'}`}>
@@ -52,7 +67,7 @@ const MainLayout = () => {
     }`}>
       <Navbar
         onMobileMenuToggle={() => setMobileOpen(!mobileOpen)}
-        onSelectTab={(tab) => setActiveTab(tab)}
+        onSelectTab={handleSelectTab}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
       />
