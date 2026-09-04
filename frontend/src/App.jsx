@@ -13,7 +13,6 @@ const MainLayout = () => {
 
   const [activeTab, setActiveTab] = useState(isAdmin ? 'admin-dashboard' : 'dashboard');
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showEmployeeLoginModal, setShowEmployeeLoginModal] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('thahira_theme') === 'dark';
   });
@@ -53,7 +52,6 @@ const MainLayout = () => {
     }`}>
       <Navbar
         onMobileMenuToggle={() => setMobileOpen(!mobileOpen)}
-        onOpenEmployeeLogin={() => setShowEmployeeLoginModal(true)}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
       />
@@ -82,21 +80,6 @@ const MainLayout = () => {
         darkMode={darkMode}
         setDarkMode={setDarkMode}
       />
-
-      {showEmployeeLoginModal && (
-        <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <Login
-              isModal={true}
-              onClose={() => setShowEmployeeLoginModal(false)}
-              onLoginSuccess={() => {
-                setShowEmployeeLoginModal(false);
-                setActiveTab('dashboard');
-              }}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Building2, Clock, Menu, Shield, User, Sun, Moon, LogOut } from 'lucide-react';
+import { Building2, Clock, Menu, Sun, Moon, LogOut } from 'lucide-react';
 
-export const Navbar = ({ onMobileMenuToggle, onOpenEmployeeLogin, darkMode, setDarkMode }) => {
+export const Navbar = ({ onMobileMenuToggle, darkMode, setDarkMode }) => {
   const { user, logout } = useAuth();
 
   const isAdmin = user?.role === 'ADMIN' || user?.is_superuser;
@@ -37,7 +37,7 @@ export const Navbar = ({ onMobileMenuToggle, onOpenEmployeeLogin, darkMode, setD
                 Thahira Groups
               </span>
               <span className="text-[9px] sm:text-[10px] text-rose-800 font-bold tracking-wider uppercase block leading-none">
-                Admin Dashboard System
+                ERP System
               </span>
             </div>
           </div>
@@ -55,17 +55,6 @@ export const Navbar = ({ onMobileMenuToggle, onOpenEmployeeLogin, darkMode, setD
             </div>
           )}
 
-          {isAdmin && (
-            <div className={`hidden sm:flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 rounded-full border text-[11px] sm:text-xs font-bold ${
-              darkMode
-                ? 'bg-rose-950/80 text-rose-300 border-rose-800'
-                : 'bg-rose-50 text-rose-900 border-rose-200'
-            }`}>
-              <Shield className="w-3.5 h-3.5 text-rose-800 shrink-0" />
-              <span className="truncate">Admin Active (No Login Required)</span>
-            </div>
-          )}
-
           <button
             onClick={() => setDarkMode(!darkMode)}
             title="Toggle Theme"
@@ -78,7 +67,6 @@ export const Navbar = ({ onMobileMenuToggle, onOpenEmployeeLogin, darkMode, setD
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          {/* User Profile Pill */}
           <div className={`flex items-center gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border ${
             darkMode
               ? 'bg-stone-800 border-stone-700'
@@ -97,19 +85,10 @@ export const Navbar = ({ onMobileMenuToggle, onOpenEmployeeLogin, darkMode, setD
             </div>
           </div>
 
-          {/* Employee Sign In Action Button (Admin requires no logout) */}
-          {isAdmin ? (
-            <button
-              onClick={onOpenEmployeeLogin}
-              className="px-3 py-1.5 bg-[#881337] hover:bg-[#991B1B] text-white font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5"
-            >
-              <User className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Employee Sign In</span>
-            </button>
-          ) : (
+          {!isAdmin && (
             <button
               onClick={logout}
-              title="Logout Employee"
+              title="Logout"
               className="p-1.5 sm:p-2 rounded-full border border-stone-200 text-stone-500 hover:text-rose-900 hover:bg-rose-50 transition-all"
             >
               <LogOut className="w-4 h-4" />
