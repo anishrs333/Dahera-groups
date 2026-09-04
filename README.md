@@ -1,4 +1,8 @@
-### HOW TO SET UP AND RUN
+Internal management software for Thahira Groups, built with Django REST Framework and React.
+
+## Setup Instructions
+
+### Backend Setup (Django REST Framework)
 
 ```bash
 cd backend
@@ -6,11 +10,10 @@ python -m venv venv
 venv\Scripts\activate  # On Windows
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py seed_data
 python manage.py runserver 8000
 ```
 
-### 2. Frontend Setup (React + Vite)
+### Frontend Setup (React 18 + Vite)
 
 ```bash
 cd frontend
@@ -18,9 +21,8 @@ npm install
 npm run dev
 ```
 
-## Admin Credentials
+## System Credentials
 
-- **Username**: `thahira_admin`
-- **Password**: `admin@123`
-- **Employee ID**: `THG-M-01`\\MALE
-- **Employee ID**:'THG-F-01\\FEAMLE
+- **Admin Account**: `thahira_admin` / `admin@123` (ID: `THG-ADM-01`)
+- **Male Employee Initial Password**: Registered Mobile Number (Shift: `10:00 AM`)
+- **Female Employee Initial Password**: Registered Mobile Number (Shift: `09:30 AM`)
