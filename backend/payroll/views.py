@@ -24,25 +24,44 @@ class SalarySlipViewSet(viewsets.ModelViewSet):
             return [IsAdminUserRole()]
         return super().get_permissions()
 
-    def perform_create(self, serializer):
-        # Auto-compute approved leave days deducted in that month if not specified
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+        
+        # Clean blank string numbers to '0'
+        for field in ['allowances', 'deductions', 'leave_days_deducted', 'basic_salary']:
+            val = data.get(field)
+            if val is None or str(val).strip() == '':
+                data[field] = '0'
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+
         emp = serializer.validated_data.get('employee')
         month = serializer.validated_data.get('month')
         year = serializer.validated_data.get('year')
-        
-        leave_deducted = serializer.validated_data.get('leave_days_deducted')
-        if leave_deducted is None or leave_deducted == 0:
-            # Query approved leave requests in month & year
-            approved_leaves = LeaveRequest.objects.filter(
-                employee=emp,
-                status='APPROVED',
-                start_date__year=year,
-                start_date__month=month
-            )
-            total_leave_days = sum(l.total_days for l in approved_leaves)
-            serializer.save(leave_days_deducted=total_leave_days)
-        else:
-            serializer.save()
+        basic_salary = serializer.validated_data.get('basic_salary')
+        allowances = serializer.validated_data.get('allowances', 0) or 0
+        deductions = serializer.validated_data.get('deductions', 0) or 0
+        leave_days_deducted = serializer.validated_data.get('leave_days_deducted', 0) or 0
+
+        # Update or create to prevent unique constraint error when re-issuing payslip
+        slip, created = SalarySlip.objects.update_or_create(
+            employee=emp,
+            month=month,
+            year=year,
+            defaults={
+                'basic_salary': basic_salary,
+                'allowances': allowances,
+                'deductions': deductions,
+                'leave_days_deducted': leave_days_deducted,
+                'status': 'PAID'
+            }
+        )
+
+        return Response(
+            SalarySlipSerializer(slip).data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated, IsSelfOrAdmin])
     def download_pdf(self, request, pk=None):

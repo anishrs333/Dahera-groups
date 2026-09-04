@@ -164,11 +164,31 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
   const handleGenerateSlipSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/payroll/slips/', slipForm);
+      const payload = {
+        ...slipForm,
+        basic_salary: slipForm.basic_salary || '0',
+        allowances: slipForm.allowances || '0',
+        deductions: slipForm.deductions || '0',
+        leave_days_deducted: slipForm.leave_days_deducted || '0'
+      };
+      await api.post('/payroll/slips/', payload);
       setShowSlipModal(false);
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.detail || 'Error generating salary slip.');
+      console.error("Salary slip error:", err.response?.data);
+      let errMsg = 'Error generating salary slip.';
+      if (err.response?.data) {
+        if (typeof err.response.data === 'string') {
+          errMsg = err.response.data;
+        } else if (err.response.data.detail) {
+          errMsg = err.response.data.detail;
+        } else {
+          errMsg = Object.entries(err.response.data)
+            .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+            .join(' | ');
+        }
+      }
+      alert(errMsg);
     }
   };
 

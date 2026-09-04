@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Building2, Lock, User, ShieldCheck, AlertCircle, ArrowRight, Shield } from 'lucide-react';
+import { Building2, Lock, User, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export const Login = () => {
-  const { login, loginDirectly } = useAuth();
+  const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,19 +16,7 @@ export const Login = () => {
     try {
       await login(username, password);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Invalid login credentials. Please verify your Employee ID / Email and Password.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAdminDirectLogin = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      await loginDirectly('thahira_admin');
-    } catch (err) {
-      setError('Admin access error.');
+      setError(err.response?.data?.detail || 'Invalid credentials. Please verify your Employee ID / Username and Password.');
     } finally {
       setLoading(false);
     }
@@ -38,7 +26,7 @@ export const Login = () => {
     <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center p-4 relative font-['Plus_Jakarta_Sans',sans-serif]">
       <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 bg-white border border-stone-200 rounded-3xl shadow-2xl overflow-hidden">
         
-        {/* Left Side: Clean Executive Brand & Admin Portal Access */}
+        {/* Left Side: Corporate Brand Overview */}
         <div className="p-8 md:p-10 bg-gradient-to-br from-[#4C0519] via-[#881337] to-[#991B1B] text-white flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3.5 mb-8">
@@ -51,38 +39,24 @@ export const Login = () => {
               </div>
             </div>
 
-            <h2 className="text-xl font-bold mb-2">Employee & Admin Portal</h2>
-            <p className="text-rose-100 text-xs leading-relaxed mb-8">
-              Sign in with your registered <strong>Employee ID</strong> or <strong>Email Address</strong> to access attendance, leaves, and salary statements.
+            <h2 className="text-xl font-bold mb-3">Enterprise Portal Sign In</h2>
+            <p className="text-rose-100 text-xs leading-relaxed">
+              Welcome to the official <strong>Thahira Groups</strong> ERP management portal. Please log in with your assigned Employee ID or Email credentials to proceed.
             </p>
-
-            {/* Direct Admin Access Button */}
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={handleAdminDirectLogin}
-                disabled={loading}
-                className="w-full bg-white hover:bg-rose-50 text-[#881337] font-black py-3 px-4 rounded-xl text-xs transition-all shadow-xl flex items-center justify-center gap-2"
-              >
-                <Shield className="w-4 h-4 text-rose-900" />
-                <span>Enter Admin Dashboard Directly</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-rose-200/80 pt-6 border-t border-white/10">
+          <div className="flex items-center gap-2 text-xs text-rose-200/80 pt-6 border-t border-white/10 mt-8">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <span>Thahira Groups ERP System • Secured & Verified</span>
           </div>
         </div>
 
-        {/* Right Side: Clean Sign In Form */}
+        {/* Right Side: Clean Sign In Form (Direct Admin Access Button Removed) */}
         <div className="p-8 md:p-10 flex flex-col justify-between bg-white">
           <div>
             <div className="mb-6">
-              <h3 className="text-xl font-black text-stone-900">Sign In to Portal</h3>
-              <p className="text-xs text-stone-500 mt-1">Enter your Employee ID or Email address below.</p>
+              <h3 className="text-xl font-black text-stone-900">Sign In</h3>
+              <p className="text-xs text-stone-500 mt-1">Enter your Employee ID, Username or Email below.</p>
             </div>
 
             {error && (
@@ -95,7 +69,7 @@ export const Login = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-stone-800 mb-1">
-                  Employee ID or Email Address
+                  Employee ID / Email / Username
                 </label>
                 <div className="relative">
                   <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -137,7 +111,7 @@ export const Login = () => {
 
           <div className="mt-8 pt-4 border-t border-stone-100 text-center">
             <span className="text-[11px] text-stone-400">
-              New employees initial password is set to their mobile number.
+              Thahira Groups Security Protocol • Authorized Access Only
             </span>
           </div>
         </div>

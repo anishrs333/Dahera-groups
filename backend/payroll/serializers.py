@@ -6,6 +6,9 @@ class SalarySlipSerializer(serializers.ModelSerializer):
     employee_details = UserSerializer(source='employee', read_only=True)
     month_name = serializers.SerializerMethodField()
     scheduled_login_time = serializers.SerializerMethodField()
+    allowances = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, allow_null=True)
+    deductions = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, allow_null=True)
+    leave_days_deducted = serializers.DecimalField(max_digits=5, decimal_places=1, required=False, allow_null=True)
 
     class Meta:
         model = SalarySlip
