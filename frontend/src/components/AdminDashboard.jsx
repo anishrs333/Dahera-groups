@@ -29,16 +29,20 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
   });
 
   const handleOpenAddModal = () => {
-    const randomId = `DEG-${Math.floor(100 + Math.random() * 900)}`;
+    const randomNum = Math.floor(4 + Math.random() * 15);
+    const formattedNum = randomNum < 10 ? `0${randomNum}` : `${randomNum}`;
+    const initialGender = 'MALE';
+    const initialId = `DHG-M-${formattedNum}`;
+    
     setNewEmp({
       username: '',
       email: '',
       first_name: '',
       last_name: '',
       password: 'Employee@123',
-      gender: 'MALE',
+      gender: initialGender,
       role: 'EMPLOYEE',
-      employee_id: randomId,
+      employee_id: initialId,
       designation: 'Software Engineer',
       department: 'Engineering',
       base_salary: '60000',
@@ -534,7 +538,13 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                   <label className="block text-slate-300 font-semibold mb-1">Gender (Sets Shift Time)</label>
                   <select
                     value={newEmp.gender}
-                    onChange={(e) => setNewEmp({...newEmp, gender: e.target.value})}
+                    onChange={(e) => {
+                      const g = e.target.value;
+                      const prefix = g === 'MALE' ? 'DHG-M-' : 'DHG-F-';
+                      const parts = newEmp.employee_id.split('-');
+                      const currNum = parts.length > 1 ? parts[parts.length - 1] : '04';
+                      setNewEmp({...newEmp, gender: g, employee_id: `${prefix}${currNum}`});
+                    }}
                     className="w-full p-2.5 bg-slate-950 border border-slate-800 text-emerald-400 font-bold rounded-xl"
                   >
                     <option value="MALE">MALE (Shift: 10:00 AM)</option>

@@ -28,10 +28,10 @@ export const Login = () => {
       setUsername('admin@dahera.com');
       setPassword('Admin@123');
     } else if (userType === 'john') {
-      setUsername('DEG-M101'); // beginner friendly: logging in using Employee ID directly!
+      setUsername('DHG-M-01'); // Male Employee ID (John Doe)
       setPassword('Employee@123');
     } else if (userType === 'sarah') {
-      setUsername('DEG-F102'); // beginner friendly: logging in using Employee ID directly!
+      setUsername('DHG-F-01'); // Female Employee ID (Sarah Connor)
       setPassword('Employee@123');
     }
   };
@@ -59,23 +59,23 @@ export const Login = () => {
 
             <h2 className="text-xl font-bold text-white mb-3">Beginner-Friendly Portal Login</h2>
             <p className="text-slate-400 text-xs leading-relaxed mb-6">
-              Log in easily using your assigned <strong>Employee ID</strong> (e.g. <code className="bg-slate-800 px-1.5 py-0.5 rounded text-emerald-300">DEG-M101</code>) or your company email address.
+              Log in using your <strong>Employee ID</strong> (e.g., <code className="bg-slate-800 px-1.5 py-0.5 rounded text-emerald-300">DHG-M-01</code> or <code className="bg-slate-800 px-1.5 py-0.5 rounded text-teal-300">DHG-F-01</code>) or your company email.
             </p>
 
             <div className="space-y-3 bg-slate-950/60 p-4 rounded-2xl border border-slate-800 text-xs">
               <div className="flex items-start gap-2.5 text-slate-300">
                 <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold text-white block">Easy Login Choice</span>
-                  <span className="text-[11px] text-slate-400">Use either your Employee ID or Email address.</span>
+                  <span className="font-bold text-white block">Male Staff IDs (Shift: 10:00 AM)</span>
+                  <span className="text-[11px] text-emerald-400 font-mono">DHG-M-01, DHG-M-02, DHG-M-03</span>
                 </div>
               </div>
               
               <div className="flex items-start gap-2.5 text-slate-300">
                 <ShieldCheck className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold text-white block">Automatic Shift Schedules</span>
-                  <span className="text-[11px] text-slate-400">Male: 10:00 AM • Female: 9:30 AM</span>
+                  <span className="font-bold text-white block">Female Staff IDs (Shift: 9:30 AM)</span>
+                  <span className="text-[11px] text-teal-300 font-mono">DHG-F-01, DHG-F-02, DHG-F-03</span>
                 </div>
               </div>
             </div>
@@ -83,11 +83,11 @@ export const Login = () => {
 
           <div className="flex items-center gap-2 text-xs text-slate-500 pt-6 border-t border-slate-800">
             <HelpCircle className="w-4 h-4 text-emerald-400" />
-            <span>Need help? Contact Dahera HR Administrator.</span>
+            <span>Need assistance? Contact Dahera Administrator.</span>
           </div>
         </div>
 
-        {/* Right Side: Form & Beginner 1-Click Quick Selectors */}
+        {/* Right Side: Form & Quick Fill */}
         <div className="p-8 md:p-10 flex flex-col justify-between bg-slate-900">
           <div>
             <div className="mb-6">
@@ -114,11 +114,11 @@ export const Login = () => {
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="e.g. DEG-M101 or user@dahera.com"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                    placeholder="e.g. DHG-M-01 or DHG-F-01"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all font-mono"
                   />
                 </div>
-                <span className="text-[10px] text-slate-500 mt-1 block">You can type your Employee ID directly!</span>
+                <span className="text-[10px] text-slate-500 mt-1 block">Type DHG-M-01 or DHG-F-01 to log in directly!</span>
               </div>
 
               <div>
@@ -146,32 +146,32 @@ export const Login = () => {
             </form>
           </div>
 
-          {/* Quick Demo Fill Buttons with clear Employee IDs */}
+          {/* Quick Demo Fill Buttons with updated DHG Employee IDs */}
           <div className="mt-8 pt-4 border-t border-slate-800">
             <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2.5">
-              1-Click Demo Login (Beginner Testing)
+              1-Click Demo Login Selectors
             </span>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => fillDemo('admin')}
-                className="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-[11px] font-semibold transition-colors"
+                className="px-2 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-[11px] font-semibold transition-colors"
               >
                 Admin
               </button>
               <button
                 type="button"
                 onClick={() => fillDemo('john')}
-                className="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 rounded-xl text-[11px] font-semibold transition-colors"
+                className="px-2 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 rounded-xl text-[11px] font-semibold transition-colors"
               >
-                ID: DEG-M101
+                DHG-M-01
               </button>
               <button
                 type="button"
                 onClick={() => fillDemo('sarah')}
-                className="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-xl text-[11px] font-semibold transition-colors"
+                className="px-2 py-2 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 rounded-xl text-[11px] font-semibold transition-colors"
               >
-                ID: DEG-F102
+                DHG-F-01
               </button>
             </div>
           </div>
