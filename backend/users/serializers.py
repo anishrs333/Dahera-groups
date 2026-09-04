@@ -37,14 +37,21 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        password = validated_data.pop('password', 'Employee@123')
+        # Initial password requirement: Initial password is the employee's Mobile Number (phone)
+        provided_password = validated_data.pop('password', None)
+        phone_number = validated_data.get('phone', '').strip()
+        
+        initial_password = provided_password or phone_number or '9876543210'
+
         # Auto-generate employee_id if missing
         if not validated_data.get('employee_id'):
-            count = User.objects.count() + 101
-            validated_data['employee_id'] = f"DEG-{count}"
+            gender_prefix = 'DHG-F-' if validated_data.get('gender') == 'FEMALE' else 'DHG-M-'
+            count = User.objects.filter(role='EMPLOYEE').count() + 1
+            formatted_num = count if count >= 10 else f"0{count}"
+            validated_data['employee_id'] = f"{gender_prefix}{formatted_num}"
 
         user = User.objects.create(**validated_data)
-        user.set_password(password)
+        user.set_password(initial_password)
         user.save()
         return user
 
@@ -59,13 +66,12 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
-    Beginner-Friendly JWT Login Serializer:
-    Allows authenticating using Email, Username, OR Employee ID!
+    JWT Serializer: Authenticate via Email, Username, or Employee ID.
+    Initial password for employees is their registered Mobile Number.
     """
     def validate(self, attrs):
         login_input = attrs.get('username', '').strip()
         if login_input:
-            # Check if input matches an employee_id or email
             user_obj = User.objects.filter(
                 Q(employee_id__iexact=login_input) | 
                 Q(email__iexact=login_input) | 

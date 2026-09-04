@@ -29,9 +29,8 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
   });
 
   const handleOpenAddModal = () => {
-    const randomNum = Math.floor(4 + Math.random() * 15);
-    const formattedNum = randomNum < 10 ? `0${randomNum}` : `${randomNum}`;
-    const initialGender = 'MALE';
+    const maleCount = employees.filter(emp => emp.gender === 'MALE').length + 1;
+    const formattedNum = maleCount >= 10 ? `${maleCount}` : `0${maleCount}`;
     const initialId = `DHG-M-${formattedNum}`;
     
     setNewEmp({
@@ -39,10 +38,11 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
       email: '',
       first_name: '',
       last_name: '',
-      password: 'Employee@123',
-      gender: initialGender,
+      password: '',
+      gender: 'MALE',
       role: 'EMPLOYEE',
       employee_id: initialId,
+      phone: '',
       designation: 'Software Engineer',
       department: 'Engineering',
       base_salary: '60000',
@@ -535,9 +535,9 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                     onChange={(e) => {
                       const g = e.target.value;
                       const prefix = g === 'MALE' ? 'DHG-M-' : 'DHG-F-';
-                      const parts = newEmp.employee_id.split('-');
-                      const currNum = parts.length > 1 ? parts[parts.length - 1] : '04';
-                      setNewEmp({...newEmp, gender: g, employee_id: `${prefix}${currNum}`});
+                      const count = employees.filter(emp => emp.gender === g).length + 1;
+                      const formattedNum = count >= 10 ? `${count}` : `0${count}`;
+                      setNewEmp({...newEmp, gender: g, employee_id: `${prefix}${formattedNum}`});
                     }}
                     className="w-full p-2.5 bg-slate-50 border border-slate-300 text-blue-700 font-bold rounded-xl"
                   >
@@ -546,7 +546,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-700 font-bold mb-1">Employee ID (Auto Generated)</label>
+                  <label className="block text-slate-700 font-bold mb-1">Employee ID (Auto-Generated)</label>
                   <input
                     type="text"
                     required
@@ -559,6 +559,19 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    Mobile Number <span className="text-emerald-600 font-semibold">(Initial Password)</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 9876543210"
+                    value={newEmp.phone}
+                    onChange={(e) => setNewEmp({...newEmp, phone: e.target.value})}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300 font-mono rounded-xl text-slate-900"
+                  />
+                </div>
+                <div>
                   <label className="block text-slate-700 font-bold mb-1">Designation</label>
                   <input
                     type="text"
@@ -568,16 +581,10 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard' }) => {
                     className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
                   />
                 </div>
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Base Salary (INR)</label>
-                  <input
-                    type="number"
-                    required
-                    value={newEmp.base_salary}
-                    onChange={(e) => setNewEmp({...newEmp, base_salary: e.target.value})}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900"
-                  />
-                </div>
+              </div>
+
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px] text-emerald-800 font-medium">
+                💡 <strong>Beginner Note:</strong> The employee's <strong>Mobile Number</strong> will be set as their initial password for portal login.
               </div>
 
               <div>

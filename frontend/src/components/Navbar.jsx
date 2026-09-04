@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Building2, LogOut, Clock, Menu, Shield, RefreshCw } from 'lucide-react';
+import { Building2, Clock, Menu, Shield, RefreshCw } from 'lucide-react';
 
 export const Navbar = ({ onMobileMenuToggle }) => {
-  const { user, loginDirectly, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const isAdmin = user?.role === 'ADMIN' || user?.is_superuser;
   const isMale = user?.gender === 'MALE';
@@ -33,7 +33,7 @@ export const Navbar = ({ onMobileMenuToggle }) => {
           </div>
         </div>
 
-        {/* Right: Portal View Quick Switcher & User Status */}
+        {/* Right: User Status & Shift Badge */}
         <div className="flex items-center gap-3 sm:gap-4">
           
           {/* Shift Schedule Badge for Employees */}
@@ -52,31 +52,9 @@ export const Navbar = ({ onMobileMenuToggle }) => {
           {isAdmin && (
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold">
               <Shield className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Admin Mode Active</span>
+              <span>Admin Control Mode</span>
             </div>
           )}
-
-          {/* Quick Portal View Switcher (No Login/Logout Friction!) */}
-          <div className="hidden lg:flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
-            <button
-              onClick={() => loginDirectly('admin@dahera.com')}
-              className={`px-2.5 py-1 rounded-lg transition-colors ${isAdmin ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
-            >
-              Admin View
-            </button>
-            <button
-              onClick={() => loginDirectly('DHG-M-01')}
-              className={`px-2.5 py-1 rounded-lg transition-colors ${!isAdmin && isMale ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
-            >
-              Male View (10 AM)
-            </button>
-            <button
-              onClick={() => loginDirectly('DHG-F-01')}
-              className={`px-2.5 py-1 rounded-lg transition-colors ${!isAdmin && !isMale ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
-            >
-              Female View (9:30 AM)
-            </button>
-          </div>
 
           {/* User Profile Badge */}
           <div className="flex items-center gap-2.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
@@ -93,11 +71,11 @@ export const Navbar = ({ onMobileMenuToggle }) => {
             </div>
           </div>
 
-          {/* Reset / Switch Account Button */}
+          {/* Reset / Sign Out Button */}
           <button
             onClick={logout}
-            title="Switch Account / Return to Portal Sign In"
-            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+            title="Sign Out"
+            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
