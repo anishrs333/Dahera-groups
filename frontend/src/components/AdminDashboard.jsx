@@ -29,11 +29,11 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
     password: '',
     gender: 'MALE',
     role: 'EMPLOYEE',
-    employee_id: 'THG-M-01',
+    employee_id: '',
     phone: '',
-    designation: 'Software Engineer',
-    department: 'Engineering',
-    base_salary: '60000',
+    designation: '',
+    department: '',
+    base_salary: '',
     bio: ''
   });
 
@@ -52,9 +52,9 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
       role: 'EMPLOYEE',
       employee_id: initialId,
       phone: '',
-      designation: 'Software Engineer',
-      department: 'Engineering',
-      base_salary: '60000',
+      designation: '',
+      department: '',
+      base_salary: '',
       bio: ''
     });
     setAddMsg('');
@@ -64,12 +64,12 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
   const [showSlipModal, setShowSlipModal] = useState(false);
   const [slipForm, setSlipForm] = useState({
     employee: '',
-    month: '9',
-    year: '2026',
-    basic_salary: '30000',
-    leave_days_deducted: '1',
-    allowances: '5000',
-    deductions: '1000'
+    month: (new Date().getMonth() + 1).toString(),
+    year: new Date().getFullYear().toString(),
+    basic_salary: '',
+    leave_days_deducted: '',
+    allowances: '',
+    deductions: ''
   });
 
   const getDaysInMonth = (month, year) => {
@@ -380,7 +380,18 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
           </button>
           
           <button
-            onClick={() => setShowSlipModal(true)}
+            onClick={() => {
+              setSlipForm({
+                employee: '',
+                month: (new Date().getMonth() + 1).toString(),
+                year: new Date().getFullYear().toString(),
+                basic_salary: '',
+                leave_days_deducted: '',
+                allowances: '',
+                deductions: ''
+              });
+              setShowSlipModal(true);
+            }}
             className="bg-rose-950/60 hover:bg-rose-950 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all border border-white/20 flex items-center gap-2"
           >
             <Receipt className="w-4 h-4" />
@@ -739,8 +750,8 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                         </span>
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="font-semibold block">{emp.designation}</span>
-                        <span className={`text-[11px] ${textMuted}`}>{emp.department}</span>
+                        <span className="font-semibold block">{emp.designation || '-'}</span>
+                        <span className={`text-[11px] ${textMuted}`}>{emp.department || '-'}</span>
                       </td>
                       <td className="py-3.5 px-4">
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
@@ -787,7 +798,18 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
               <p className={`text-xs mt-0.5 ${textMuted}`}>Issued salary statements and calendar rate deductions.</p>
             </div>
             <button
-              onClick={() => setShowSlipModal(true)}
+              onClick={() => {
+                setSlipForm({
+                  employee: '',
+                  month: (new Date().getMonth() + 1).toString(),
+                  year: new Date().getFullYear().toString(),
+                  basic_salary: '',
+                  leave_days_deducted: '',
+                  allowances: '',
+                  deductions: ''
+                });
+                setShowSlipModal(true);
+              }}
               className="bg-[#881337] hover:bg-[#991B1B] text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-colors flex items-center gap-1.5 shadow-md shadow-rose-950/20"
             >
               <Receipt className="w-4 h-4" />
@@ -869,6 +891,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   <input
                     type="text"
                     required
+                    placeholder="Enter first name"
                     value={newEmp.first_name}
                     onChange={(e) => setNewEmp({...newEmp, first_name: e.target.value})}
                     className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
@@ -879,6 +902,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   <input
                     type="text"
                     required
+                    placeholder="Enter last name"
                     value={newEmp.last_name}
                     onChange={(e) => setNewEmp({...newEmp, last_name: e.target.value})}
                     className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
@@ -891,6 +915,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                 <input
                   type="email"
                   required
+                  placeholder="e.g. employee@thahira.com"
                   value={newEmp.email}
                   onChange={(e) => setNewEmp({...newEmp, username: e.target.value, email: e.target.value})}
                   className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
@@ -932,7 +957,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   <input
                     type="text"
                     required
-                    placeholder="Mobile number"
+                    placeholder="Enter mobile number"
                     value={newEmp.phone}
                     onChange={(e) => setNewEmp({...newEmp, phone: e.target.value})}
                     className="w-full p-2.5 bg-stone-50 border border-stone-300 font-mono rounded-xl text-stone-900"
@@ -943,6 +968,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   <input
                     type="text"
                     required
+                    placeholder="e.g. Software Engineer"
                     value={newEmp.designation}
                     onChange={(e) => setNewEmp({...newEmp, designation: e.target.value})}
                     className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
@@ -950,14 +976,39 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-stone-700 font-bold mb-1">Department</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Engineering"
+                    value={newEmp.department}
+                    onChange={(e) => setNewEmp({...newEmp, department: e.target.value})}
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-stone-700 font-bold mb-1">Monthly Salary (INR)</label>
+                  <input
+                    type="number"
+                    required
+                    placeholder="e.g. 50000"
+                    value={newEmp.base_salary}
+                    onChange={(e) => setNewEmp({...newEmp, base_salary: e.target.value})}
+                    className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 font-bold"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-stone-700 font-bold mb-1">Bio</label>
+                <label className="block text-stone-700 font-bold mb-1">Bio / Notes</label>
                 <textarea
                   rows="2"
                   value={newEmp.bio}
                   onChange={(e) => setNewEmp({...newEmp, bio: e.target.value})}
                   className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
-                  placeholder="Notes..."
+                  placeholder="Enter bio notes..."
                 ></textarea>
               </div>
 
@@ -1050,6 +1101,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   <input
                     type="number"
                     required
+                    placeholder="Enter basic salary"
                     value={slipForm.basic_salary}
                     onChange={(e) => setSlipForm({...slipForm, basic_salary: e.target.value})}
                     className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 font-bold"
@@ -1062,7 +1114,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                     step="0.5"
                     value={slipForm.leave_days_deducted}
                     onChange={(e) => setSlipForm({...slipForm, leave_days_deducted: e.target.value})}
-                    placeholder="Days"
+                    placeholder="Enter leave days (e.g. 1)"
                     className="w-full p-2.5 bg-stone-50 border border-stone-300 text-rose-900 rounded-xl text-stone-900 font-bold"
                   />
                 </div>
@@ -1092,6 +1144,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   <label className="block text-stone-700 font-bold mb-1">Allowances (INR)</label>
                   <input
                     type="number"
+                    placeholder="Enter allowances"
                     value={slipForm.allowances}
                     onChange={(e) => setSlipForm({...slipForm, allowances: e.target.value})}
                     className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
@@ -1101,6 +1154,7 @@ export const AdminDashboard = ({ subTab = 'admin-dashboard', darkMode = false })
                   <label className="block text-stone-700 font-bold mb-1">Deductions (INR)</label>
                   <input
                     type="number"
+                    placeholder="Enter deductions"
                     value={slipForm.deductions}
                     onChange={(e) => setSlipForm({...slipForm, deductions: e.target.value})}
                     className="w-full p-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900"
