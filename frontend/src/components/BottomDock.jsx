@@ -26,7 +26,7 @@ export const BottomDock = ({ activeTab, setActiveTab, darkMode, setDarkMode }) =
   const dockItems = isAdmin ? adminDockItems : employeeDockItems;
 
   return (
-    <div className="fixed bottom-2 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 font-['Plus_Jakarta_Sans',sans-serif] px-2 max-w-[98vw] sm:max-w-full">
+    <div className="md:hidden fixed bottom-2 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 font-['Plus_Jakarta_Sans',sans-serif] px-2 max-w-[98vw] sm:max-w-full">
       <div className={`flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full border shadow-2xl backdrop-blur-md transition-all duration-300 ${
         darkMode
           ? 'bg-stone-900/90 border-stone-800 text-white shadow-rose-950/40'

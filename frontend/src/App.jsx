@@ -38,7 +38,7 @@ const MainLayout = () => {
     if (isAdmin) {
       if (targetTab === 'leaves') setActiveTab('admin-leaves');
       else if (targetTab === 'payroll') setActiveTab('admin-payroll');
-      else if (targetTab === 'attendance') setActiveTab('admin-dashboard');
+      else if (targetTab === 'attendance') setActiveTab('admin-attendance');
       else setActiveTab(targetTab);
     } else {
       if (targetTab === 'admin-leaves') setActiveTab('leaves');
@@ -72,7 +72,7 @@ const MainLayout = () => {
         setDarkMode={setDarkMode}
       />
 
-      <div className="flex flex-1 max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 pb-24">
+      <div className="flex flex-1 max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 pb-20 md:pb-6">
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -90,6 +90,7 @@ const MainLayout = () => {
         </main>
       </div>
 
+      {/* Floating Bottom Magnetic Dock Bar - Renders ONLY on Mobile (< 768px) */}
       <BottomDock
         activeTab={activeTab}
         setActiveTab={setActiveTab}
