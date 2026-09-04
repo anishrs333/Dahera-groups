@@ -3,7 +3,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
-from decimal import Decimal
 
 def generate_salary_slip_pdf(salary_slip) -> bytes:
     buffer = io.BytesIO()
@@ -17,9 +16,9 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     )
 
     styles = getSampleStyleSheet()
-    
+
     title_style = ParagraphStyle(
-        'CompanyHeader',
+        'HeaderTitle',
         parent=styles['Heading1'],
         fontName='Helvetica-Bold',
         fontSize=22,
@@ -28,7 +27,7 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
         alignment=1
     )
     subtitle_style = ParagraphStyle(
-        'CompanySub',
+        'HeaderSub',
         parent=styles['Normal'],
         fontName='Helvetica',
         fontSize=10,
@@ -36,13 +35,15 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
         textColor=colors.HexColor('#52525B'),
         alignment=1
     )
-    section_style = ParagraphStyle(
-        'SectionHeader',
+    section_heading = ParagraphStyle(
+        'SecHeading',
         parent=styles['Heading2'],
         fontName='Helvetica-Bold',
         fontSize=12,
-        leading=15,
-        textColor=colors.HexColor('#1C1917')
+        leading=16,
+        textColor=colors.HexColor('#881337'),
+        spaceBefore=10,
+        spaceAfter=6
     )
     cell_bold = ParagraphStyle(
         'CellBold',
@@ -64,117 +65,123 @@ def generate_salary_slip_pdf(salary_slip) -> bytes:
     elements = []
 
     elements.append(Paragraph("THAHIRA GROUPS ENTERPRISE", title_style))
-    elements.append(Paragraph("Official Employee Payslip & Calendar Breakdown", subtitle_style))
-    elements.append(Spacer(1, 10))
-    elements.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#881337'), spaceAfter=15))
+    elements.append(Paragraph("Official Monthly Salary & Payroll Statement", subtitle_style))
+    elements.append(Spacer(1, 8))
+    elements.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#881337'), spaceAfter=12))
 
     emp = salary_slip.employee
+    emp_name = emp.get_full_name() or emp.username
+    emp_id = emp.employee_id or 'N/A'
+    dept = emp.department or 'Engineering'
+    desig = emp.designation or 'Staff Member'
     month_name = salary_slip.get_month_name()
-    login_time = emp.get_scheduled_login_time()
+    year = salary_slip.year
 
-    meta_data = [
+    info_data = [
         [
-            Paragraph("<b>Employee Name:</b>", cell_bold), Paragraph(emp.get_full_name() or emp.username, cell_normal),
-            Paragraph("<b>Employee ID:</b>", cell_bold), Paragraph(emp.employee_id or "N/A", cell_normal)
+            Paragraph("<b>Employee Name:</b>", cell_bold), Paragraph(emp_name, cell_normal),
+            Paragraph("<b>Pay Period:</b>", cell_bold), Paragraph(f"{month_name} {year}", cell_normal)
         ],
         [
-            Paragraph("<b>Gender:</b>", cell_bold), Paragraph(emp.get_gender_display(), cell_normal),
-            Paragraph("<b>Scheduled Login Time:</b>", cell_bold), Paragraph(f"<b>{login_time}</b>", cell_normal)
+            Paragraph("<b>Employee ID:</b>", cell_bold), Paragraph(emp_id, cell_normal),
+            Paragraph("<b>Department:</b>", cell_bold), Paragraph(dept, cell_normal)
         ],
         [
-            Paragraph("<b>Designation:</b>", cell_bold), Paragraph(emp.designation or "Staff", cell_normal),
-            Paragraph("<b>Department:</b>", cell_bold), Paragraph(emp.department or "General", cell_normal)
-        ],
-        [
-            Paragraph("<b>Pay Period:</b>", cell_bold), Paragraph(f"{month_name} {salary_slip.year}", cell_normal),
-            Paragraph("<b>Payment Status:</b>", cell_bold), Paragraph(salary_slip.status, cell_normal)
+            Paragraph("<b>Designation:</b>", cell_bold), Paragraph(desig, cell_normal),
+            Paragraph("<b>Payment Status:</b>", cell_bold), Paragraph(f"<font color='#15803D'><b>{salary_slip.status}</b></font>", cell_normal)
         ]
     ]
 
-    meta_table = Table(meta_data, colWidths=[130, 140, 130, 140])
-    meta_table.setStyle(TableStyle([
+    info_table = Table(info_data, colWidths=[100, 170, 100, 170])
+    info_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#FAF9F6')),
         ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#E7E5E4')),
         ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor('#F5F5F4')),
         ('TOPPADDING', (0,0), (-1,-1), 6),
         ('BOTTOMPADDING', (0,0), (-1,-1), 6),
     ]))
-    elements.append(meta_table)
-    elements.append(Spacer(1, 15))
+    elements.append(info_table)
+    elements.append(Spacer(1, 12))
 
-    elements.append(Paragraph("Month Calendar & Daily Rate Calculation", section_style))
-    elements.append(Spacer(1, 6))
-
-    calendar_data = [
+    elements.append(Paragraph("Calendar Month & Rate Breakdown", section_heading))
+    cal_data = [
         [
-            Paragraph("<b>Total Calendar Days in Month:</b>", cell_bold), Paragraph(f"{salary_slip.days_in_month} Days", cell_normal),
-            Paragraph("<b>Per-Day Salary Rate:</b>", cell_bold), Paragraph(f"<b>₹{salary_slip.daily_rate:,.2f} / day</b>", cell_normal)
+            Paragraph("<b>Month Calendar Days:</b>", cell_bold), Paragraph(f"{salary_slip.days_in_month} Days", cell_normal),
+            Paragraph("<b>Per-Day Salary Rate:</b>", cell_bold), Paragraph(f"<b>${salary_slip.daily_rate:,.2f} / day</b>", cell_normal)
         ],
         [
-            Paragraph("<b>Leave / Absence Days Deducted:</b>", cell_bold), Paragraph(f"{salary_slip.leave_days_deducted} Day(s)", cell_normal),
-            Paragraph("<b>Leave Deduction Amount:</b>", cell_bold), Paragraph(f"<font color='#991B1B'><b>-₹{salary_slip.leave_deduction_amount:,.2f}</b></font>", cell_normal)
+            Paragraph("<b>Unpaid Leave Days:</b>", cell_bold), Paragraph(f"{salary_slip.leave_days_deducted} Days", cell_normal),
+            Paragraph("<b>Leave Deduction Amount:</b>", cell_bold), Paragraph(f"<font color='#991B1B'><b>-${salary_slip.leave_deduction_amount:,.2f}</b></font>", cell_normal)
         ]
     ]
-    calendar_table = Table(calendar_data, colWidths=[160, 110, 150, 120])
-    calendar_table.setStyle(TableStyle([
+    cal_table = Table(cal_data, colWidths=[130, 140, 130, 140])
+    cal_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#FFF1F2')),
-        ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#FECDD3')),
-        ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor('#FFE4E6')),
+        ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#FFE4E6')),
+        ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor('#FECDD3')),
         ('TOPPADDING', (0,0), (-1,-1), 6),
         ('BOTTOMPADDING', (0,0), (-1,-1), 6),
     ]))
-    elements.append(calendar_table)
-    elements.append(Spacer(1, 15))
+    elements.append(cal_table)
+    elements.append(Spacer(1, 12))
 
-    elements.append(Paragraph("Earnings Components & Deductions Summary", section_style))
-    elements.append(Spacer(1, 6))
-
-    gross_earnings = (salary_slip.basic_salary - salary_slip.leave_deduction_amount) + salary_slip.allowances
-    if gross_earnings < Decimal('0.00'):
-        gross_earnings = Decimal('0.00')
-
-    breakdown_data = [
-        [Paragraph("<b>Earnings Description</b>", cell_bold), Paragraph("<b>Amount (INR)</b>", cell_bold), Paragraph("<b>Deductions Description</b>", cell_bold), Paragraph("<b>Amount (INR)</b>", cell_bold)],
-        [Paragraph("Base Monthly Basic Salary", cell_normal), Paragraph(f"₹{salary_slip.basic_salary:,.2f}", cell_normal), Paragraph("Leave Absence Deduction", cell_normal), Paragraph(f"-₹{salary_slip.leave_deduction_amount:,.2f}", cell_normal)],
-        [Paragraph("HRA & Allowances", cell_normal), Paragraph(f"₹{salary_slip.allowances:,.2f}", cell_normal), Paragraph("PF / Tax Deductions", cell_normal), Paragraph(f"-₹{salary_slip.deductions:,.2f}", cell_normal)],
-        [Paragraph("<b>Total Gross Earnings</b>", cell_bold), Paragraph(f"<b>₹{gross_earnings:,.2f}</b>", cell_bold), Paragraph("<b>Total Deductions</b>", cell_bold), Paragraph(f"<b>₹{(salary_slip.leave_deduction_amount + salary_slip.deductions):,.2f}</b>", cell_bold)]
+    elements.append(Paragraph("Earnings & Deductions Summary", section_heading))
+    
+    table_data = [
+        [
+            Paragraph("<b>Earnings Description</b>", cell_bold), Paragraph("<b>Amount ($)</b>", cell_bold),
+            Paragraph("<b>Deductions Description</b>", cell_bold), Paragraph("<b>Amount ($)</b>", cell_bold)
+        ],
+        [Paragraph("Base Monthly Basic Salary", cell_normal), Paragraph(f"${salary_slip.basic_salary:,.2f}", cell_normal), Paragraph("Leave Absence Deduction", cell_normal), Paragraph(f"-${salary_slip.leave_deduction_amount:,.2f}", cell_normal)],
+        [Paragraph("HRA & Allowances", cell_normal), Paragraph(f"${salary_slip.allowances:,.2f}", cell_normal), Paragraph("PF / Tax Deductions", cell_normal), Paragraph(f"-${salary_slip.deductions:,.2f}", cell_normal)],
+        [
+            Paragraph("<b>Total Gross Earnings</b>", cell_bold),
+            Paragraph(f"<b>${(salary_slip.basic_salary + salary_slip.allowances):,.2f}</b>", cell_bold),
+            Paragraph("<b>Total Deductions</b>", cell_bold),
+            Paragraph(f"<b>${(salary_slip.leave_deduction_amount + salary_slip.deductions):,.2f}</b>", cell_bold)
+        ]
     ]
 
-    breakdown_table = Table(breakdown_data, colWidths=[150, 120, 150, 120])
+    breakdown_table = Table(table_data, colWidths=[150, 120, 150, 120])
     breakdown_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#881337')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#D6D3D1')),
         ('BACKGROUND', (0,-1), (-1,-1), colors.HexColor('#F5F5F4')),
-        ('TOPPADDING', (0,0), (-1,-1), 7),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 7),
+        ('TOPPADDING', (0,0), (-1,-1), 6),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
     ]))
     elements.append(breakdown_table)
     elements.append(Spacer(1, 15))
 
-    net_data = [
+    net_pay_data = [
         [
-            Paragraph("<b>NET TAKE-HOME SALARY:</b>", ParagraphStyle('NetLbl', parent=styles['Heading2'], fontSize=12, textColor=colors.HexColor('#881337'))),
-            Paragraph(f"<b>₹{salary_slip.net_salary:,.2f}</b>", ParagraphStyle('NetVal', parent=styles['Heading1'], fontSize=16, textColor=colors.HexColor('#15803D'), alignment=2))
+            Paragraph("<b>NET TAKE-HOME SALARY PAYABLE:</b>", ParagraphStyle('NetLbl', parent=styles['Heading2'], fontSize=12, textColor=colors.HexColor('#881337'))),
+            Paragraph(f"<b>${salary_slip.net_salary:,.2f}</b>", ParagraphStyle('NetVal', parent=styles['Heading1'], fontSize=16, textColor=colors.HexColor('#15803D'), alignment=2))
         ]
     ]
-    net_table = Table(net_data, colWidths=[250, 290])
+    net_table = Table(net_pay_data, colWidths=[300, 240])
     net_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#FFF1F2')),
-        ('BOX', (0,0), (-1,-1), 1.5, colors.HexColor('#E11D48')),
-        ('TOPPADDING', (0,0), (-1,-1), 8),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#F0FDF4')),
+        ('BOX', (0,0), (-1,-1), 1.5, colors.HexColor('#16A34A')),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING', (0,0), (-1,-1), 10),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 10),
     ]))
     elements.append(net_table)
-    elements.append(Spacer(1, 30))
+    elements.append(Spacer(1, 20))
 
-    sig_data = [
-        [Paragraph("__________________________<br/><b>Employee Signature</b>", cell_normal), Paragraph("__________________________<br/><b>Authorized Signatory (Thahira HR)</b>", cell_normal)]
-    ]
-    sig_table = Table(sig_data, colWidths=[270, 270])
-    elements.append(sig_table)
+    footer_style = ParagraphStyle(
+        'Footer',
+        parent=styles['Normal'],
+        fontName='Helvetica-Oblique',
+        fontSize=8,
+        textColor=colors.HexColor('#71717A'),
+        alignment=1
+    )
+    elements.append(Paragraph("This is a computer-generated salary slip. Authorized by Thahira Groups Enterprise.", footer_style))
 
     doc.build(elements)
-    pdf_value = buffer.getvalue()
+    pdf_bytes = buffer.getvalue()
     buffer.close()
-    return pdf_value
+    return pdf_bytes
