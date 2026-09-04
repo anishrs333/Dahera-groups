@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, UserCheck, CalendarDays, Receipt, Users, X } from 'lucide-react';
+import { LayoutDashboard, UserCheck, CalendarDays, Receipt, Users, X, Shield } from 'lucide-react';
 
 export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) => {
   const { user } = useAuth();
@@ -14,11 +14,11 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
   ];
 
   const adminNav = [
-    { id: 'admin-dashboard', label: 'Admin Overview', icon: LayoutDashboard },
+    { id: 'admin-dashboard', label: 'Admin Executive Overview', icon: LayoutDashboard },
     { id: 'admin-employees', label: 'Employee Directory', icon: Users },
-    { id: 'admin-leaves', label: 'Leave Requests', icon: CalendarDays },
-    { id: 'admin-payroll', label: 'Payroll & Slips', icon: Receipt },
-    { id: 'attendance', label: 'My Attendance', icon: UserCheck },
+    { id: 'admin-leaves', label: 'Leave Approvals Queue', icon: CalendarDays },
+    { id: 'admin-payroll', label: 'Payroll & Salary Slips', icon: Receipt },
+    { id: 'attendance', label: 'My Personal Attendance', icon: UserCheck },
   ];
 
   const navItems = isAdmin ? adminNav : employeeNav;
@@ -29,15 +29,22 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
   };
 
   const navContent = (
-    <div className="flex flex-col h-full justify-between py-5 bg-slate-900 border-r border-slate-800">
+    <div className="flex flex-col h-full justify-between py-5 bg-white border-r border-slate-200">
       <div>
         <div className="px-5 mb-5 flex items-center justify-between">
-          <span className="text-[11px] font-extrabold text-emerald-400 uppercase tracking-wider">
-            {isAdmin ? 'Admin Control Portal' : 'Employee Portal'}
+          <span className="text-[11px] font-bold text-blue-600 uppercase tracking-wider flex items-center gap-1.5">
+            {isAdmin ? (
+              <>
+                <Shield className="w-3.5 h-3.5 text-blue-600" />
+                <span>Admin Command Center</span>
+              </>
+            ) : (
+              <span>Employee Portal</span>
+            )}
           </span>
           <button
             onClick={() => setMobileOpen(false)}
-            className="md:hidden text-slate-400 hover:text-white"
+            className="md:hidden text-slate-400 hover:text-slate-600"
           >
             <X className="w-5 h-5" />
           </button>
@@ -51,13 +58,13 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
               <button
                 key={item.id}
                 onClick={() => handleSelect(item.id)}
-                className={`w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-semibold transition-all ${
+                className={`w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs font-bold transition-all ${
                   isActive
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                 <span>{item.label}</span>
               </button>
             );
@@ -65,9 +72,9 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
         </nav>
       </div>
 
-      <div className="px-5 pt-4 border-t border-slate-800 text-xs text-slate-500">
-        <p className="font-bold text-slate-300">Dahera Groups ERP v1.0</p>
-        <p className="text-[11px]">Security Verified System</p>
+      <div className="px-5 pt-4 border-t border-slate-100 text-xs text-slate-400">
+        <p className="font-bold text-slate-700">Dahera Groups ERP v1.0</p>
+        <p className="text-[11px]">User-Friendly Enterprise Suite</p>
       </div>
     </div>
   );
@@ -83,13 +90,13 @@ export const Sidebar = ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }) 
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-40 md:hidden"
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 md:hidden"
         />
       )}
 
       {/* Mobile Drawer Panel */}
       <div
-        className={`fixed top-0 left-0 bottom-0 w-64 bg-slate-900 z-50 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl ${
+        className={`fixed top-0 left-0 bottom-0 w-64 bg-white z-50 transform transition-transform duration-300 ease-in-out md:hidden shadow-2xl ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

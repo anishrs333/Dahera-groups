@@ -38,6 +38,11 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
+  // Seamless Direct Login Helper (Zero-Friction for Admin or Quick Switch)
+  const loginDirectly = async (identifier) => {
+    return await login(identifier, 'Admin@123' && identifier === 'admin@dahera.com' ? 'Admin@123' : 'Employee@123');
+  };
+
   const logout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -53,7 +58,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateProfile, loading }}>
+    <AuthContext.Provider value={{ user, login, loginDirectly, logout, updateProfile, loading }}>
       {children}
     </AuthContext.Provider>
   );
