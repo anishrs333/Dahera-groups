@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import EmployeeDashboard from './components/EmployeeDashboard';
+import BottomDock from './components/BottomDock';
 
 const MainLayout = () => {
   const { user, loading } = useAuth();
@@ -49,7 +50,7 @@ const MainLayout = () => {
         setDarkMode={setDarkMode}
       />
 
-      <div className="flex flex-1 max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8">
+      <div className="flex flex-1 max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 pb-24">
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -70,6 +71,14 @@ const MainLayout = () => {
           )}
         </main>
       </div>
+
+      {/* Floating Bottom Magnetic Dock Bar for Employee & Admin Navigation */}
+      <BottomDock
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
     </div>
   );
 };
