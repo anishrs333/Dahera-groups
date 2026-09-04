@@ -40,7 +40,8 @@ export const AuthProvider = ({ children }) => {
 
   // Seamless Direct Login Helper (Zero-Friction for Admin or Quick Switch)
   const loginDirectly = async (identifier) => {
-    return await login(identifier, 'Admin@123' && identifier === 'admin@dahera.com' ? 'Admin@123' : 'Employee@123');
+    const passwordToUse = identifier === 'thahira_admin' ? 'admin@123' : 'Employee@123';
+    return await login(identifier, passwordToUse);
   };
 
   const logout = () => {

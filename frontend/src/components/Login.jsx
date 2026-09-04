@@ -26,7 +26,7 @@ export const Login = () => {
     setError('');
     setLoading(true);
     try {
-      await loginDirectly('admin@dahera.com');
+      await loginDirectly('thahira_admin');
     } catch (err) {
       setError('Admin access error.');
     } finally {
