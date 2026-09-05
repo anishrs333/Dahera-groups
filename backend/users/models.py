@@ -59,6 +59,7 @@ class Notification(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_notifications')
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    read_by = models.ManyToManyField(User, blank=True, related_name='read_notifications')
 
     class Meta:
         ordering = ['-created_at']

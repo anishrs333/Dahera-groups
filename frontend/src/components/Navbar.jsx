@@ -51,10 +51,46 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
     }
   };
 
-  const handleNotificationClick = (n) => {
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
+  const handleNotificationClick = async (n) => {
+    if (!n.is_read) {
+      try {
+        setNotifications((prev) =>
+          prev.map((item) => (item.id === n.id ? { ...item, is_read: true } : item))
+        );
+        await api.post(`/users/notifications/${n.id}/mark-read/`);
+        fetchNotifications();
+      } catch (err) {
+        console.error("Mark notification read error:", err);
+      }
+    }
     setShowNotifPanel(false);
     if (n.link_tab && onSelectTab) {
       onSelectTab(n.link_tab);
+    }
+  };
+
+  const handleMarkAllRead = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    try {
+      setNotifications((prev) => prev.map((item) => ({ ...item, is_read: true })));
+      await api.post('/users/notifications/mark-all-read/');
+      fetchNotifications();
+    } catch (err) {
+      console.error("Mark all notifications read error:", err);
+      fetchNotifications();
+    }
+  };
+
+  const handleToggleNotifPanel = () => {
+    const nextState = !showNotifPanel;
+    setShowNotifPanel(nextState);
+    if (nextState && unreadCount > 0) {
+      handleMarkAllRead();
     }
   };
 
@@ -106,7 +142,7 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
 
           <div className="relative">
             <button
-              onClick={() => setShowNotifPanel(!showNotifPanel)}
+              onClick={handleToggleNotifPanel}
               title="Notifications"
               className={`p-1.5 sm:p-2 rounded-full border transition-all duration-200 active:scale-95 relative ${
                 darkMode
@@ -115,9 +151,9 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
               }`}
             >
               <Bell className="w-4 h-4" />
-              {notifications.length > 0 && (
+              {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white rounded-full text-[9px] font-black flex items-center justify-center animate-pulse">
-                  {notifications.length}
+                  {unreadCount}
                 </span>
               )}
             </button>
@@ -130,10 +166,26 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
                   <div className="flex items-center gap-2">
                     <Megaphone className="w-4 h-4 text-rose-800" />
                     <h4 className="font-bold text-xs">Notifications & Alerts</h4>
+                    {unreadCount > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-rose-100 text-rose-800 font-bold">
+                        {unreadCount} new
+                      </span>
+                    )}
                   </div>
-                  <button onClick={() => setShowNotifPanel(false)} className="text-stone-400 hover:text-stone-700 p-1">
-                    <X className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleMarkAllRead}
+                        className="text-[10px] text-rose-800 font-bold hover:underline px-1 py-0.5 rounded transition-colors hover:bg-rose-50"
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                    <button onClick={() => setShowNotifPanel(false)} className="text-stone-400 hover:text-stone-700 p-1">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 {isAdmin && (
@@ -158,16 +210,29 @@ export const Navbar = ({ onMobileMenuToggle, onSelectTab, darkMode, setDarkMode 
                         key={n.id}
                         onClick={() => handleNotificationClick(n)}
                         className={`p-3 rounded-xl border text-xs space-y-1 cursor-pointer transition-all hover:scale-[1.01] ${
-                          darkMode ? 'bg-stone-950 border-stone-800 hover:bg-stone-800' : 'bg-stone-50 border-stone-200 hover:bg-rose-50/50'
+                          !n.is_read
+                            ? darkMode
+                              ? 'bg-rose-950/40 border-rose-800/60 text-white'
+                              : 'bg-rose-50/70 border-rose-200 text-stone-900'
+                            : darkMode
+                              ? 'bg-stone-950 border-stone-800 text-stone-300 opacity-80'
+                              : 'bg-stone-50 border-stone-200 text-stone-600'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-1">
-                          <strong className="font-bold text-rose-900 truncate">{n.title}</strong>
-                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold shrink-0">
+                          <div className="flex items-center gap-1.5 truncate">
+                            {!n.is_read && (
+                              <span className="w-2 h-2 rounded-full bg-rose-600 shrink-0" title="Unread" />
+                            )}
+                            <strong className={`font-bold truncate ${!n.is_read ? 'text-rose-900' : 'text-stone-700'}`}>
+                              {n.title}
+                            </strong>
+                          </div>
+                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-stone-200/60 text-stone-700 font-bold shrink-0">
                             {n.target}
                           </span>
                         </div>
-                        <p className="text-stone-600 text-[11px] leading-relaxed line-clamp-2">{n.message}</p>
+                        <p className="text-[11px] leading-relaxed line-clamp-2">{n.message}</p>
                         <div className="flex items-center justify-between pt-1">
                           <span className="text-[9px] text-stone-400">
                             {new Date(n.created_at).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}

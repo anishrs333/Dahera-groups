@@ -30,16 +30,23 @@ class UserSerializer(serializers.ModelSerializer):
 
 class NotificationSerializer(serializers.ModelSerializer):
     created_by_name = serializers.SerializerMethodField()
+    is_read = serializers.SerializerMethodField()
 
     class Meta:
         model = Notification
-        fields = ['id', 'recipient', 'title', 'message', 'target', 'link_tab', 'created_by', 'created_by_name', 'created_at', 'is_active']
+        fields = ['id', 'recipient', 'title', 'message', 'target', 'link_tab', 'created_by', 'created_by_name', 'created_at', 'is_active', 'is_read']
         read_only_fields = ['id', 'created_by', 'created_at']
 
     def get_created_by_name(self, obj):
         if obj.created_by:
             return obj.created_by.get_full_name() or obj.created_by.username
         return 'System'
+
+    def get_is_read(self, obj):
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated:
+            return obj.read_by.filter(id=request.user.id).exists()
+        return False
 
 class UserCreateUpdateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=False, allow_blank=True, allow_null=True)

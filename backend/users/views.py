@@ -76,10 +76,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_admin_role:
-            return Notification.objects.filter(
-                Q(target__in=['ALL', 'ADMIN']) | Q(recipient=user),
-                is_active=True
-            ).order_by('-created_at')
+            return Notification.objects.filter(is_active=True).order_by('-created_at')
         return Notification.objects.filter(
             Q(recipient=user) | Q(recipient__isnull=True, target__in=['ALL', 'EMPLOYEE']),
             is_active=True
@@ -92,6 +89,19 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
+
+    @action(detail=True, methods=['post'], url_path='mark-read')
+    def mark_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.read_by.add(request.user)
+        return Response({'status': 'success', 'message': 'Notification marked as read'})
+
+    @action(detail=False, methods=['post'], url_path='mark-all-read')
+    def mark_all_read(self, request):
+        notifications = list(self.get_queryset())
+        for notif in notifications:
+            notif.read_by.add(request.user)
+        return Response({'status': 'success', 'message': 'All notifications marked as read'})
 
 class ChangePasswordView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]

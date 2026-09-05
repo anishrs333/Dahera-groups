@@ -38,3 +38,45 @@ class UserTerminationAndPasswordTestCase(TestCase):
         self.male_user.set_password('NewSecurePass@2026')
         self.male_user.save()
         self.assertTrue(self.male_user.check_password('NewSecurePass@2026'))
+
+class NotificationReadTestCase(TestCase):
+    def setUp(self):
+        from users.models import Notification
+        self.user = User.objects.create_user(
+            username='emp_notif@thahira.com',
+            email='emp_notif@thahira.com',
+            password='Password123',
+            role=User.Role.EMPLOYEE
+        )
+        self.notification = Notification.objects.create(
+            title='Test Broadcast',
+            message='Test message',
+            target='ALL'
+        )
+
+    def test_notification_mark_read(self):
+        from users.serializers import NotificationSerializer
+        from rest_framework.test import APIRequestFactory
+
+        factory = APIRequestFactory()
+        request = factory.get('/')
+        request.user = self.user
+
+        serializer = NotificationSerializer(self.notification, context={'request': request})
+        self.assertFalse(serializer.data['is_read'])
+
+        self.notification.read_by.add(self.user)
+
+        serializer_after = NotificationSerializer(self.notification, context={'request': request})
+        self.assertTrue(serializer_after.data['is_read'])
+
+    def test_mark_all_read_endpoint(self):
+        from rest_framework.test import APIClient
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        
+        response = client.post('/api/users/notifications/mark-all-read/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.notification.read_by.filter(id=self.user.id).exists())
+
+

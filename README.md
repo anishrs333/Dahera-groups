@@ -23,6 +23,8 @@ npm run dev
 
 ## System Credentials
 
-- **Admin Account**: `thahira_admin` / `admin@123` (ID: `THG-ADM-01`)
+
+- **Admin Account**: `thahira_admin` / `admin@123`
 - **Male Employee Initial Password**: Registered Mobile Number (Shift: `10:00 AM`)
 - **Female Employee Initial Password**: Registered Mobile Number (Shift: `09:30 AM`)
+
