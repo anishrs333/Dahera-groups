@@ -39,7 +39,10 @@ class Attendance(models.Model):
         if not self.expected_login_time and self.employee:
             self.expected_login_time = self.employee.get_scheduled_login_time()
 
-        # Calculate working hours if check_out exists
+        if self.check_in and (not self.status or self.status in [self.Status.ON_TIME, self.Status.LATE]):
+            self.evaluate_late_status()
+
+
         if self.check_in and self.check_out:
             delta = self.check_out - self.check_in
             self.working_hours = round(delta.total_seconds() / 3600.0, 2)
@@ -49,19 +52,14 @@ class Attendance(models.Model):
         super().save(*args, **kwargs)
 
     def evaluate_late_status(self):
-        """
-        Determines whether check_in is late based on employee gender schedule:
-        - Male: 10:00 AM
-        - Female: 09:30 AM
-        """
+       
         if not self.check_in or not self.employee:
             return
         
-        # Local time of check_in
-        check_in_time = self.check_in.time()
+        local_check_in = timezone.localtime(self.check_in)
+        check_in_time = local_check_in.time()
         scheduled_time = self.employee.get_scheduled_login_time_obj()
 
-        # Grace period 5 minutes
         cutoff_seconds = (scheduled_time.hour * 3600) + (scheduled_time.minute * 60) + 300
         actual_seconds = (check_in_time.hour * 3600) + (check_in_time.minute * 60) + check_in_time.second
 
